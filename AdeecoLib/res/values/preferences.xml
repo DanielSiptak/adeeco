@@ -1,0 +1,7 @@
+<resources>
+    
+    <string name="service_autostart_title">Start service automatically</string>
+    <string name="service_autostart_summary">Do you want to start service right after application start</string>
+    
+    
+</resources>

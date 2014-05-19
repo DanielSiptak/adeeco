@@ -1,0 +1,17 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="service_autostart"
+        android:summary="@string/service_autostart_summary"
+        android:title="@string/service_autostart_title" />
+    <MultiSelectListPreference
+        android:key="list_preference_2"
+        android:title="list preferences"
+        android:summary="list aaaaa"
+        android:entries="@array/apps"
+        android:entryValues="@array/apps"
+        android:defaultValue="@array/apps"
+        android:dialogTitle="choosse default applications" />
+
+   </PreferenceScreen>

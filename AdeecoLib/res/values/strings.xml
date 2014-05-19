@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Adeeco</string>
+    <string name="preference_activity_title">Settings</string>
+    <string name="action_settings">Settings</string>
+    <string name="service_status_start">Start service</string>
+    <string name="service_status_stop">Stop service</string>
+    <string name="start_service">Start service</string>
+    <string name="stop_service">Stop service</string>
+    <string name="start_runtime">Start executing</string>
+    <string name="pause_runtime">Pause execution</string>
+    <string name="start_nodea">NodeA component</string>
+    <string name="start_nodeb">NodeB component</string>
+    <string name="start_alert">Alert ensemble</string>
+    <string name="start_migration">Migration ensemble</string>
+    <string name="remote_service_connected">Adeeco service connected</string>
+    <string name="remote_service_disconnected">Adeeco service disconnected</string>
+    <string name="service_notification">Adeeco service</string>
+    <string name="service_notification_label">Adeeco service label</string>
+    <string name="title_bundle_list">Bundles</string>
+    <string name="title_bundle_detail">Bundle Detail</string>
+
+</resources>

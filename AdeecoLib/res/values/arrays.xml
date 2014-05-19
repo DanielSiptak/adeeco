@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="apps" >
+        <item>Cloud demo</item>
+        <item>Convoy demo</item>
+    </string-array>
+</resources>
