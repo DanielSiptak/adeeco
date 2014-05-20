@@ -49,9 +49,9 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * @author Bela Ban
  */
 @Unsupported(comment="Use JBossCache instead")
-public class ReplicatedHashMap<K extends Serializable, V extends Serializable> extends
+public class ReplicatedHashMap<K extends Serializable, V extends IMergeable> extends
         AbstractMap<K,V> implements ConcurrentMap<K,V>, ExtendedReceiver, ReplicatedMap<K,V> {
-
+	
     public interface Notification<K extends Serializable, V extends Serializable> {
         void entrySet(K key, V value);
 
@@ -551,7 +551,25 @@ public class ReplicatedHashMap<K extends Serializable, V extends Serializable> e
     /*------------------------ Callbacks -----------------------*/
 
     public V _put(K key, V value) {
-        V retval=map.put(key, value);
+    	/**
+    	 * This is support for merging of the sub clusters
+    	 * It will override value in map only if new value has bigger modCount than the old one.
+    	 */
+    	/*
+    	V retval = null;
+    	if ( value instanceof MergingValueHolder ) {
+    		MergingValueHolder holder = (MergingValueHolder) value;
+    		retval = map.put(key, (V) holder.mergeWith((MergingValueHolder) map.get(key))); 	
+    	} else {
+    		retval = map.put(key, value);
+    	}
+    	*/
+    	V retval;
+    	if (value != null) {
+    		retval =  map.put(key,(V) value.merge((V)map.get(key)));
+    	} else {
+    		retval = map.put(key, value);
+    	}
         if(persistent) {
             try {
                 persistence_mgr.save(key, value);
@@ -815,6 +833,7 @@ public class ReplicatedHashMap<K extends Serializable, V extends Serializable> e
         //if size is bigger than one, there are more peers in the group
         //otherwise there is only one server.
         send_message=members.size() > 1;
+        //TODO need to add merge
     }
 
     /**

@@ -33,7 +33,9 @@ public class AdeecoRuntimeSingleton {
 			} else {
 				km = new RepositoryKnowledgeManager(
 						new LoggingKnowledgeRepository(
-								new ReplicatedKnowledgeRepository()));
+								new ReplicatedKnowledgeRepository()
+								,true)
+						);
 			}
 		} else {
 			//TODO clean the km need to add it to knowledge interface

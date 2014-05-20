@@ -11,12 +11,12 @@ import java.io.Serializable;
  * @author Daniel Sipták
  *
  */
-
+@Deprecated
 public class MergingValueHolder<T> implements Comparable<MergingValueHolder<T>>, Serializable{
 
 	private static final long serialVersionUID = 1L;
 	private T obj;
-	private int count = 0;
+	private int modCount = 0;
 	
 	public MergingValueHolder() {
 	}
@@ -36,13 +36,14 @@ public class MergingValueHolder<T> implements Comparable<MergingValueHolder<T>>,
 	 * @param value to be stored
 	 */
 	public MergingValueHolder<T> set(T value){
-		count++;
+		modCount++;
+		System.out.println("mergecount "+modCount);
 		obj = value;
 		return this;
 	}
 	
 	public String toString(){
-		return obj.toString() + " " + count;
+		return obj.toString() + " " + modCount;
 	}
 	
 	/**
@@ -53,13 +54,27 @@ public class MergingValueHolder<T> implements Comparable<MergingValueHolder<T>>,
 	 * @return holder which should be used after merging
 	 */
 	public MergingValueHolder<T> mergeWith(MergingValueHolder<T> another){
-		if (compareTo(another) >= 0) {
+		if (another==null||compareTo(another) >= 0) {
 			return this;
 		} else {
 			return another;
 		}
 	}
 	
+	public static MergingValueHolder<?> merge(MergingValueHolder<?> first,MergingValueHolder<?> second){
+		if (first == null) {
+			return second;
+		}
+		if (second == null) {
+			return first;
+		}
+		if ((first.modCount - second.modCount) >= 0) {
+			return first;
+		} else {
+			return second;
+		}
+	}
+
 	/**
 	 * Compares number of writes for the {@link MergingValueHolder} object
 	 *  @return 0 if number of writes is equal
@@ -67,6 +82,6 @@ public class MergingValueHolder<T> implements Comparable<MergingValueHolder<T>>,
 	 *  		<0 it object has less writes that another
 	 */
 	public int compareTo(MergingValueHolder<T> another) {
-		return this.count - another.count;
+		return this.modCount - another.modCount;
 	}
 }
