@@ -68,7 +68,7 @@ public class MigrationEnsemble extends Ensemble {
 		Float avarage = (mLoad.item+cLoad.item)/2;
 		mLoad.item=avarage;
 		cLoad.item=avarage;
-		String text = "Balance load form "+mId+" to " + cId;
+		String text = "Balance load from "+mId+" to " + cId;
 		System.out.println(text);
 		AppLogger logger = AppMessenger.getInstance().getLogger("MigrationEnsemble");
 		logger.addLog(text);
