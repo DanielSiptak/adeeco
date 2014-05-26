@@ -1,6 +1,0 @@
-INDEX VERSION 1.126+/home/daniel/workspace/diploma/.metadata/.plugins/org.eclipse.jdt.core
-1758309159.index
-1377251446.index
-2119568350.index
-530335298.index
-2465675891.index

@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">
-<refactoring comment="Copy 2 elements to &apos;AdeecoLib/src/cz.cuni.mff.d3s.deeco.knowledge.jgroups&apos;&#x0A;- Original project: &apos;jjdeeco&apos;&#x0A;- Destination element: &apos;AdeecoLib/src/cz.cuni.mff.d3s.deeco.knowledge.jgroups&apos;&#x0A;- Original elements:&#x0A;     cz.cuni.mff.d3s.deeco.knowledge.jgroups.MergingValueHolder.java&#x0A;     cz.cuni.mff.d3s.deeco.knowledge.jgroups.ReplicatedKnowledgeRepository.java" description="Copy compilation units" destination="=AdeecoLib/src&lt;cz.cuni.mff.d3s.deeco.knowledge.jgroups" element1="/src&lt;cz.cuni.mff.d3s.deeco.knowledge.jgroups{MergingValueHolder.java" element2="/src&lt;cz.cuni.mff.d3s.deeco.knowledge.jgroups{ReplicatedKnowledgeRepository.java" files="0" flags="589830" folders="0" id="org.eclipse.jdt.ui.copy" policy="org.eclipse.jdt.ui.copyResources" stamp="1400529386173" units="2" version="1.0"/>
-</session>
