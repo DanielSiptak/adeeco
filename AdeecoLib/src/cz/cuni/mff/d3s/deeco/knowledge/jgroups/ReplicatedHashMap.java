@@ -15,6 +15,8 @@ import org.jgroups.persistence.PersistenceManager;
 import org.jgroups.util.Promise;
 import org.jgroups.util.Util;
 
+import cz.cuni.mff.d3s.deeco.knowledge.local.DeepCopy;
+
 import java.io.*;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -49,11 +51,13 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * @author Bela Ban
  */
 @Unsupported(comment="Use JBossCache instead")
-public class ReplicatedHashMap<K extends Serializable, V extends IMergeable> extends
+public class ReplicatedHashMap<K extends Serializable, V extends IVersioning> extends
         AbstractMap<K,V> implements ConcurrentMap<K,V>, ExtendedReceiver, ReplicatedMap<K,V> {
 	
-    public interface Notification<K extends Serializable, V extends Serializable> {
+    public interface Notification<K extends Serializable, V extends IVersioning> {
         void entrySet(K key, V value);
+        
+        void entryReplaced(K key,V value);
 
         void entryRemoved(K key);
 
@@ -111,7 +115,8 @@ public class ReplicatedHashMap<K extends Serializable, V extends IMergeable> ext
     private final Vector<Address> members=new Vector<Address>(); // keeps track of all DHTs
     private boolean persistent=false; // whether to use PersistenceManager to save state
     private PersistenceManager persistence_mgr=null;
-
+    private boolean notifierEnabled;
+    
     /**
      * Determines when the updates have to be sent across the network, avoids
      * sending unnecessary messages when there are no member in the group
@@ -324,6 +329,14 @@ public class ReplicatedHashMap<K extends Serializable, V extends IMergeable> ext
             notifs.remove(n);
     }
 
+    public boolean isNotifierEnabled() {
+		return notifierEnabled;
+	}
+
+	public void setNotifierEnabled(boolean notificationsEnabled) {
+		this.notifierEnabled = notificationsEnabled;
+	}
+
     public void stop() {
         if(disp != null) {
             disp.stop();
@@ -335,7 +348,22 @@ public class ReplicatedHashMap<K extends Serializable, V extends IMergeable> ext
         }
     }
 
-    /**
+    private V getNewer(V inserted,V current){
+    	return (isNewer(inserted,current)) ? inserted : current;
+    }
+    
+    private boolean isNewer(V inserted, V current) {
+		
+		if (inserted != null&&current != null) {
+			return inserted.getVersion() > current.getVersion();
+		}
+		if (current == null) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
      * Maps the specified key to the specified value in this table. Neither the
      * key nor the value can be null. <p/>
      * <p>
@@ -556,20 +584,14 @@ public class ReplicatedHashMap<K extends Serializable, V extends IMergeable> ext
     	 * It will override value in map only if new value has bigger modCount than the old one.
     	 */
     	/*
-    	V retval = null;
-    	if ( value instanceof MergingValueHolder ) {
-    		MergingValueHolder holder = (MergingValueHolder) value;
-    		retval = map.put(key, (V) holder.mergeWith((MergingValueHolder) map.get(key))); 	
+    	V retval;
+    	if (value != null) {
+    		retval =  map.put(key,(V) value.getStamp((V)map.get(key)));
     	} else {
     		retval = map.put(key, value);
     	}
     	*/
-    	V retval;
-    	if (value != null) {
-    		retval =  map.put(key,(V) value.merge((V)map.get(key)));
-    	} else {
-    		retval = map.put(key, value);
-    	}
+    	V retval = map.put(key,getNewer(value, map.get(key)));
         if(persistent) {
             try {
                 persistence_mgr.save(key, value);
@@ -579,13 +601,15 @@ public class ReplicatedHashMap<K extends Serializable, V extends IMergeable> ext
                     log.error("failed persisting " + key + " + " + value, t);
             }
         }
-        for(Notification notif:notifs)
-            notif.entrySet(key, value);
+        if (notifierEnabled) {
+	        for(Notification notif:notifs)
+	            notif.entrySet(key, value);
+        }
         return retval;
     }
 
     public V _putIfAbsent(K key, V value) {
-        V retval=map.putIfAbsent(key, value);
+    	V retval = map.putIfAbsent(key,getNewer(value, map.get(key)));
         if(persistent) {
             try {
                 persistence_mgr.save(key, value);
@@ -595,8 +619,10 @@ public class ReplicatedHashMap<K extends Serializable, V extends IMergeable> ext
                     log.error("failed persisting " + key + " + " + value, t);
             }
         }
-        for(Notification notif:notifs)
+        if (notifierEnabled) {
+    	for(Notification notif:notifs)
             notif.entrySet(key, value);
+        }
         return retval;
     }
 
@@ -612,10 +638,9 @@ public class ReplicatedHashMap<K extends Serializable, V extends IMergeable> ext
         // lock contention for the map.
 
         // ---> super.putAll(m); <--- CULPRIT !!!@#$%$
-
         // That said let's do it the stupid way:
         for(Map.Entry<? extends K,? extends V> entry:map.entrySet()) {
-            this.map.put(entry.getKey(), entry.getValue());
+            this.map.put(entry.getKey(), getNewer(entry.getValue(), map.get(entry.getKey())));
         }
 
         if(persistent && !map.isEmpty()) {
@@ -627,7 +652,7 @@ public class ReplicatedHashMap<K extends Serializable, V extends IMergeable> ext
                     log.error("failed persisting contents", t);
             }
         }
-        if(!map.isEmpty()) {
+        if(!map.isEmpty()&&notifierEnabled) {
             for(Notification notif:notifs)
                 notif.contentsSet(map);
         }
@@ -644,8 +669,10 @@ public class ReplicatedHashMap<K extends Serializable, V extends IMergeable> ext
                     log.error("failed clearing contents", t);
             }
         }
-        for(Notification notif:notifs)
-            notif.contentsCleared();
+        if (notifierEnabled) {
+	        for(Notification notif:notifs)
+	            notif.contentsCleared();
+        }
     }
 
     public V _remove(Object key) {
@@ -659,7 +686,7 @@ public class ReplicatedHashMap<K extends Serializable, V extends IMergeable> ext
                     log.error("failed removing " + key, t);
             }
         }
-        if(retval != null) {
+        if(retval != null&&notifierEnabled) {
             for(Notification notif:notifs)
                 notif.entryRemoved((K)key);
         }
@@ -678,7 +705,7 @@ public class ReplicatedHashMap<K extends Serializable, V extends IMergeable> ext
                     log.error("failed removing " + key, t);
             }
         }
-        if(removed) {
+        if(removed && notifierEnabled) {
             for(Notification notif:notifs)
                 notif.entryRemoved((K)key);
         }
@@ -696,7 +723,7 @@ public class ReplicatedHashMap<K extends Serializable, V extends IMergeable> ext
                     log.error("failed saving " + key + ", " + newValue, t);
             }
         }
-        if(replaced) {
+        if(replaced && notifierEnabled) {
             for(Notification notif:notifs)
                 notif.entrySet(key, newValue);
         }
@@ -714,8 +741,10 @@ public class ReplicatedHashMap<K extends Serializable, V extends IMergeable> ext
                     log.error("failed saving " + key + ", " + value, t);
             }
         }
-        for(Notification notif:notifs)
-            notif.entrySet(key, value);
+        if (notifierEnabled){
+	        for(Notification notif:notifs)
+	            notif.entrySet(key, value);
+        }
         return retval;
     }
 
@@ -729,7 +758,7 @@ public class ReplicatedHashMap<K extends Serializable, V extends IMergeable> ext
         K key;
         V val;
         Map<K,V> copy=new HashMap<K,V>();
-
+        
         for(Map.Entry<K,V> entry:entrySet()) {
             key=entry.getKey();
             val=entry.getValue();
@@ -762,9 +791,7 @@ public class ReplicatedHashMap<K extends Serializable, V extends IMergeable> ext
         state_promise.setResult(Boolean.TRUE);
     }
 
-
-        public byte[] getState(String state_id) {
-        // not implemented
+    public byte[] getState(String state_id) {
         return null;
     }
 
@@ -871,9 +898,9 @@ public class ReplicatedHashMap<K extends Serializable, V extends IMergeable> ext
                 left.addElement(mbr);
             }
         }
-
-        for(Notification notif:notifs) {
-            notif.viewChange(view, joined, left);
+        if (notifierEnabled) {
+	        for(Notification notif:notifs)
+	            notif.viewChange(view, joined, left);
         }
     }
 

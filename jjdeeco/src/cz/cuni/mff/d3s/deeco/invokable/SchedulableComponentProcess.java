@@ -80,6 +80,7 @@ public class SchedulableComponentProcess extends SchedulableProcess {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
+		//System.out.println("Component process ends - " + this.toString());
 	}
 
 	private void evaluateMethod() throws KMException {

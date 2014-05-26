@@ -15,9 +15,12 @@
  ******************************************************************************/
 package cz.cuni.mff.d3s.deeco.knowledge.jgroups;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.jgroups.Channel;
@@ -28,7 +31,9 @@ import cz.cuni.mff.d3s.deeco.exceptions.KRExceptionAccessError;
 import cz.cuni.mff.d3s.deeco.exceptions.KRExceptionUnavailableEntry;
 import cz.cuni.mff.d3s.deeco.knowledge.ISession;
 import cz.cuni.mff.d3s.deeco.knowledge.KnowledgeRepository;
+import cz.cuni.mff.d3s.deeco.knowledge.jgroups.ReplicatedHashMap.Notification;
 import cz.cuni.mff.d3s.deeco.knowledge.local.DeepCopy;
+import cz.cuni.mff.d3s.deeco.scheduling.ETriggerType;
 import cz.cuni.mff.d3s.deeco.scheduling.IKnowledgeChangeListener;
 import cz.cuni.mff.ms.siptak.adeecolib.service.AppMessenger;
 import cz.cuni.mff.ms.siptak.adeecolib.service.AppMessenger.AppLogger;
@@ -47,6 +52,7 @@ public class ReplicatedKnowledgeRepository extends KnowledgeRepository {
 	private Channel channel = null;
 
 	private AppLogger logger = AppMessenger.getInstance().getLogger("ReplicatedHashMap");
+	private Map<IKnowledgeChangeListener,KnowledgeNotification> listeners = new ConcurrentHashMap<IKnowledgeChangeListener,KnowledgeNotification>(); 
 	
 	public ReplicatedKnowledgeRepository() {
 		try {
@@ -90,30 +96,17 @@ public class ReplicatedKnowledgeRepository extends KnowledgeRepository {
 	@Override
 	public void put(String entryKey, Object value, ISession session)
 			throws KRExceptionAccessError {
-		/*
-		MergingValueHolder<LinkedList<Object>> holder=map.get(entryKey);
-		if (holder == null) {
-			holder = new MergingValueHolder<LinkedList<Object>>();
-		}
-		LinkedList<Object> vals = holder.get();
-		*/
 		ReplicatedList<Object> vals = map.get(entryKey);
 		if (vals == null) {
 			vals = new ReplicatedList<Object>();
 		}
 		vals.add(value);
-		//map.put(entryKey, holder.set(vals));
 		map.put(entryKey, vals);
 	}
 
 	@Override
 	public Object[] take(String entryKey, ISession session)
 			throws KRExceptionUnavailableEntry, KRExceptionAccessError {
-		/*
-		MergingValueHolder<LinkedList<Object>> holder=map.get(entryKey);
-		
-		List<Object> vals = holder.get();
-		*/
 		ReplicatedList<Object> vals = map.get(entryKey);
 		
 		if (vals == null) {
@@ -136,27 +129,34 @@ public class ReplicatedKnowledgeRepository extends KnowledgeRepository {
 
 	@Override
 	public boolean registerListener(IKnowledgeChangeListener listener) {
-		// TODO Auto-generated method stub
-		//Notification<Serializable, Serializable>
-		//map.addNotifier(n);
+		if (!listeners.containsKey(listener)){
+			KnowledgeNotification notification = new KnowledgeNotification(listener);
+			listeners.put(listener, notification);
+			map.addNotifier(notification);
+		}
 		return false;
 	}
 
 	@Override
 	public void setListenersActive(boolean on) {
-		// TODO Auto-generated method stub
+		map.setNotifierEnabled(on);
 	}
 
 	@Override
 	public boolean isListenersActive() {
-		// TODO Auto-generated method stub
-		return false;
+		return map.isNotifierEnabled();
 	}
 
 	@Override
 	public boolean unregisterListener(IKnowledgeChangeListener listener) {
-		// TODO Auto-generated method stub
-		return false;
+		if (listeners.containsKey(listener)){
+			KnowledgeNotification notification = listeners.get(listener);
+			 map.removeNotifier(notification);
+			 listeners.remove(listener);
+			 return true;
+		} else {
+			return false;
+		}
 	}
 
 	/**

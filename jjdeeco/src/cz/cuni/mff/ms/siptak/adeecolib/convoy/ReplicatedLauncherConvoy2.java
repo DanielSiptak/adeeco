@@ -25,7 +25,7 @@ public class ReplicatedLauncherConvoy2 {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		List<Class<?>> components = Arrays.asList(new Class<?>[] { });
+		List<Class<?>> components = Arrays.asList(new Class<?>[] {  RobotFollowerComponent.class });
 		List<Class<?>> ensembles = Arrays
 				.asList(new Class<?>[] { ConvoyEnsemble.class });
 		KnowledgeManager km = new RepositoryKnowledgeManager(

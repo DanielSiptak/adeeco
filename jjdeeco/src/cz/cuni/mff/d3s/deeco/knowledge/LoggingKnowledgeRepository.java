@@ -7,27 +7,41 @@ import cz.cuni.mff.d3s.deeco.scheduling.IKnowledgeChangeListener;
 public class LoggingKnowledgeRepository extends KnowledgeRepository {
 	
 	KnowledgeRepository decorateKr;
+	Boolean printValues = false;
 	
 	public LoggingKnowledgeRepository(KnowledgeRepository knowledgeRepositoty) {
 		this.decorateKr=knowledgeRepositoty;
 	}
 	
+	public LoggingKnowledgeRepository(KnowledgeRepository knowledgeRepositoty,Boolean printValues) {
+		this.decorateKr=knowledgeRepositoty;
+		this.printValues = true;
+	}
+	
+	private void printEntry(String message,String entryKey, Object value) {
+		String val="";
+		if (printValues && value!=null){
+			val=" -> "+value.toString();
+		}
+		System.out.println(message+" : "+entryKey+val);
+	}
+	
 	public Object [] get(String entryKey, ISession session)
 			throws KRExceptionUnavailableEntry, KRExceptionAccessError
 	{
-		System.out.println("get S "+entryKey.toString());
+		printEntry("get S", entryKey, null);
 		return decorateKr.get(entryKey,session);	
 	}
 	
 	public void put(String entryKey, Object value, ISession session)
 			throws KRExceptionAccessError {
-		System.out.println("put S "+entryKey.toString());
+		printEntry("put S", entryKey, value);
 		decorateKr.put(entryKey,value,session);
 	}
 
 	public Object [] take(String entryKey, ISession session)
 			throws KRExceptionUnavailableEntry, KRExceptionAccessError {
-		System.out.println("take S "+entryKey.toString());
+		printEntry("take S", entryKey, null);
 		return decorateKr.take(entryKey, session);
 	}
 	
@@ -58,18 +72,18 @@ public class LoggingKnowledgeRepository extends KnowledgeRepository {
 
 	public Object [] get(String entryKey) throws KRExceptionUnavailableEntry,
 			KRExceptionAccessError {
-		System.out.println("get "+entryKey.toString());
+		printEntry("get", entryKey, null);
 		return decorateKr.get(entryKey);
 	}
 
 	public void put(String entryKey, Object value)
 			throws KRExceptionAccessError {
-		System.out.println("put "+entryKey.toString());
+		printEntry("put", entryKey, value);
 		decorateKr.put(entryKey, value);
 	}
 
 	public Object [] take(String entryKey) throws KRExceptionUnavailableEntry, KRExceptionAccessError {
-		System.out.println("take "+entryKey.toString());
+		printEntry("take", entryKey, null);
 		return decorateKr.take(entryKey);
 	}
 }

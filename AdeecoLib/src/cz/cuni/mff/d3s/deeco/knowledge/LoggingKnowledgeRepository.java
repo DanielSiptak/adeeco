@@ -1,6 +1,5 @@
 package cz.cuni.mff.d3s.deeco.knowledge;
 
-import android.os.Message;
 import cz.cuni.mff.d3s.deeco.exceptions.KRExceptionAccessError;
 import cz.cuni.mff.d3s.deeco.exceptions.KRExceptionUnavailableEntry;
 import cz.cuni.mff.d3s.deeco.scheduling.IKnowledgeChangeListener;

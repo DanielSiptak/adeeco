@@ -34,6 +34,7 @@ public class RepositoryKnowledgeManagerHelper {
 				if ((newValue != null || currentValue != null)
 						&& !Arrays.deepEquals((Object[]) currentValue,
 								new Object[] { newValue })) {
+					//TODO replace needed
 					kr.take(knowledgePath, session);
 					kr.put(knowledgePath, newValue, session);
 				}

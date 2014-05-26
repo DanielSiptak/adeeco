@@ -15,8 +15,6 @@
  ******************************************************************************/
 package cz.cuni.mff.d3s.deeco.knowledge;
 
-import android.service.textservice.SpellCheckerService.Session;
-
 /**
  * Interface representing session, which is used for performing bulk of
  * operations on the knowledge repository. It is used to guarantee data

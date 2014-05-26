@@ -13,34 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package cz.cuni.mff.d3s.deeco.knowledge;
+package cz.cuni.mff.d3s.deeco.demo.convoy;
 
-import cz.cuni.mff.d3s.deeco.exceptions.KRExceptionAccessError;
-import cz.cuni.mff.d3s.deeco.exceptions.KRExceptionUnavailableEntry;
+import java.util.List;
+
+import cz.cuni.mff.d3s.deeco.knowledge.Knowledge;
+
 
 /**
- * An abstract class specifing and defining basic operations on the knowledge
- * repository.
+ * Class describing a robot path.
  * 
  * @author Michal Kit
- * 
+ *
  */
-public abstract class KnowledgeRepository implements IKnowledgeRepository {
+public class Path extends Knowledge {
+	public Integer currentPosition;
+	public List<Integer> remainingPath;
 
-	@Override
-	public Object [] get(String entryKey) throws KRExceptionUnavailableEntry,
-			KRExceptionAccessError {
-		return get(entryKey, null);
-	}
-
-	@Override
-	public void put(String entryKey, Object value)
-			throws KRExceptionAccessError {
-		put(entryKey, value, null);
-	}
-
-	@Override
-	public Object [] take(String entryKey) throws KRExceptionUnavailableEntry, KRExceptionAccessError {
-		return take(entryKey, null);
+	public Integer getNextPosition() {
+		if (remainingPath.size() > 0) {
+			return remainingPath.get(0);
+		}
+		return -1;
 	}
 }

@@ -15,7 +15,6 @@
  ******************************************************************************/
 package cz.cuni.mff.d3s.deeco.knowledge;
 
-
 /**
  * Interface representing session, which is used for performing bulk of
  * operations on the knowledge repository. It is used to guarantee data

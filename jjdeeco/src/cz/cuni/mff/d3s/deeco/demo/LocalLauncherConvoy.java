@@ -1,11 +1,13 @@
-package cz.cuni.mff.ms.siptak.adeecolib.convoy;
+package cz.cuni.mff.d3s.deeco.demo;
 
 import java.util.Arrays;
 import java.util.List;
 
+import cz.cuni.mff.d3s.deeco.demo.convoy.ConvoyEnsemble;
+import cz.cuni.mff.d3s.deeco.demo.convoy.RobotFollowerComponent;
+import cz.cuni.mff.d3s.deeco.demo.convoy.RobotLeaderComponent;
 import cz.cuni.mff.d3s.deeco.knowledge.KnowledgeManager;
 import cz.cuni.mff.d3s.deeco.knowledge.RepositoryKnowledgeManager;
-import cz.cuni.mff.d3s.deeco.knowledge.jgroups.ReplicatedKnowledgeRepository;
 import cz.cuni.mff.d3s.deeco.knowledge.local.LocalKnowledgeRepository;
 import cz.cuni.mff.d3s.deeco.provider.AbstractDEECoObjectProvider;
 import cz.cuni.mff.d3s.deeco.provider.ClassDEECoObjectProvider;
@@ -19,18 +21,18 @@ import cz.cuni.mff.d3s.deeco.scheduling.Scheduler;
  * @author Michal Kit
  * 
  */
-public class ReplicatedLauncherConvoy {
+public class LocalLauncherConvoy {
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		List<Class<?>> components = Arrays.asList(new Class<?>[] {
-				RobotLeaderComponent.class});
+				RobotLeaderComponent.class, RobotFollowerComponent.class });
 		List<Class<?>> ensembles = Arrays
-				.asList(new Class<?>[] { });
+				.asList(new Class<?>[] { ConvoyEnsemble.class });
 		KnowledgeManager km = new RepositoryKnowledgeManager(
-				new ReplicatedKnowledgeRepository());
+				new LocalKnowledgeRepository());
 		Scheduler scheduler = new MultithreadedScheduler();
 		AbstractDEECoObjectProvider dop = new ClassDEECoObjectProvider(
 				components, ensembles);
