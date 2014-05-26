@@ -1,0 +1,61 @@
+package cz.cuni.mff.d3s.deeco.knowledge;
+
+import cz.cuni.mff.d3s.deeco.exceptions.KRExceptionAccessError;
+import cz.cuni.mff.d3s.deeco.exceptions.KRExceptionUnavailableEntry;
+import cz.cuni.mff.d3s.deeco.scheduling.IKnowledgeChangeListener;
+
+public class LoggingKnowledgeRepository {
+	
+	KnowledgeRepository kr;
+	
+	public LoggingKnowledgeRepository(KnowledgeRepository knowledgeRepositoty) {
+		this.kr=knowledgeRepositoty;
+	}
+	
+	public Object [] get(String entryKey, ISession session)
+			throws KRExceptionUnavailableEntry, KRExceptionAccessError
+	{
+		return kr.get(entryKey,session);	
+	}
+	public void put(String entryKey, Object value, ISession session)
+			throws KRExceptionAccessError {
+		kr.put(entryKey,value,session);
+	}
+
+	public Object [] take(String entryKey, ISession session)
+			throws KRExceptionUnavailableEntry, KRExceptionAccessError {
+		return null;
+	}
+	
+	public boolean registerListener(IKnowledgeChangeListener listener) {
+		return false;
+	}
+	
+	public boolean unregisterListener(IKnowledgeChangeListener listener) {
+		return false;
+	}
+	
+	public void setListenersActive(boolean on) {
+	}
+	
+	public boolean isListenersActive() {
+		return false;
+	}
+	
+	public ISession createSession() {
+		return null;
+	}
+
+	public Object [] get(String entryKey) throws KRExceptionUnavailableEntry,
+			KRExceptionAccessError {
+		return null;
+	}
+
+	public void put(String entryKey, Object value)
+			throws KRExceptionAccessError {
+	}
+
+	public Object [] take(String entryKey) throws KRExceptionUnavailableEntry, KRExceptionAccessError {
+		return null;
+	}
+}
