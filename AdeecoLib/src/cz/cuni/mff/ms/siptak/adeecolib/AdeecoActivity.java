@@ -46,7 +46,6 @@ public class AdeecoActivity extends Activity {
 	 * Multicast lock for enabling multicast for this application
 	 */
 	MulticastLock lock;
-
 	
 	/** Messenger for communicating with service. */
 	Messenger mService = null;

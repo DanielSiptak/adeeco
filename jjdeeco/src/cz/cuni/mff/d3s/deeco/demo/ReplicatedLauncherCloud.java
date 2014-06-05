@@ -35,14 +35,15 @@ public class ReplicatedLauncherCloud {
 						new ReplicatedKnowledgeRepository()));
 		*/
 		
-		
+		/*
 		KnowledgeManager km = new RepositoryKnowledgeManager(
 									new LoggingKnowledgeRepository(
 										new ReplicatedKnowledgeRepository()));
-		/*
+		*/
+		
 		KnowledgeManager km = new RepositoryKnowledgeManager(
-				new ReplicatedKnowledgeRepository());
- 		*/	
+									new ReplicatedKnowledgeRepository());
+ 			
 		Scheduler scheduler = new MultithreadedScheduler();
 		AbstractDEECoObjectProvider dop = new ClassDEECoObjectProvider( components, ensembles);
 		Runtime rt = new Runtime(km, scheduler);

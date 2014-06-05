@@ -42,7 +42,7 @@ public class AppMessenger {
 		}
 		
 		public void addLog(String log){
-			System.out.println(mTag+" : "+log);
+			//System.out.println(mTag+" : "+log);
 		}
 
 	}

@@ -25,7 +25,7 @@ public class KnowledgeNotification implements Notification{
 	}
 	
 	@Override
-	public void entrySet(Serializable key, IVersioning value) {
+	public void entrySet(Serializable key, IMerging value) {
 		List<String> paths = listener.getKnowledgePaths();
 		if (paths.contains(key)) {
 			listener.knowledgeChanged(key.toString(), ETriggerType.KNOWLEDGE);
@@ -33,7 +33,7 @@ public class KnowledgeNotification implements Notification{
 	}
 
 	@Override
-	public void entryReplaced(Serializable key, IVersioning value) {
+	public void entryReplaced(Serializable key, IMerging value) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -53,7 +53,7 @@ public class KnowledgeNotification implements Notification{
 	@Override
 	public void contentsSet(Map new_entries) {
 		for (String key : (Collection<String>) new_entries.keySet()) {
-			entrySet(key, (IVersioning) new_entries.get(key));
+			entrySet(key, (IMerging) new_entries.get(key));
 		}
 	}
 

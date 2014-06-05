@@ -15,9 +15,7 @@
  ******************************************************************************/
 package cz.cuni.mff.d3s.deeco.knowledge.jgroups;
 
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,9 +29,7 @@ import cz.cuni.mff.d3s.deeco.exceptions.KRExceptionAccessError;
 import cz.cuni.mff.d3s.deeco.exceptions.KRExceptionUnavailableEntry;
 import cz.cuni.mff.d3s.deeco.knowledge.ISession;
 import cz.cuni.mff.d3s.deeco.knowledge.KnowledgeRepository;
-import cz.cuni.mff.d3s.deeco.knowledge.jgroups.ReplicatedHashMap.Notification;
 import cz.cuni.mff.d3s.deeco.knowledge.local.DeepCopy;
-import cz.cuni.mff.d3s.deeco.scheduling.ETriggerType;
 import cz.cuni.mff.d3s.deeco.scheduling.IKnowledgeChangeListener;
 import cz.cuni.mff.ms.siptak.adeecolib.service.AppMessenger;
 import cz.cuni.mff.ms.siptak.adeecolib.service.AppMessenger.AppLogger;
@@ -46,6 +42,10 @@ import cz.cuni.mff.ms.siptak.adeecolib.service.AppMessenger.AppLogger;
  */
 public class ReplicatedKnowledgeRepository extends KnowledgeRepository {
 
+	//protected class ReplicatedKnowledgeList<Object> implements ReplicatedList<Object>(){};
+		
+		
+	
 	final ReentrantLock lock = new ReentrantLock();
 	//private ReplicatedHashMap<String, MergingValueHolder<LinkedList<Object>>> map;// = new HashMap<String, List<Object>>();
 	private ReplicatedHashMap<String, ReplicatedList<Object>> map;// = new HashMap<String, List<Object>>();
@@ -56,12 +56,13 @@ public class ReplicatedKnowledgeRepository extends KnowledgeRepository {
 	
 	public ReplicatedKnowledgeRepository() {
 		try {
-			channel = new JChannel();
+			
+			System.setProperty("java.net.preferIPv4Stack" , "true");
+			channel = new JChannel("assets/udp.xml");
 			channel.connect("Adeeco");
-		
-			//ReplicatedHashMap<String, MergingValueHolder<LinkedList<Object>>> replMap = new ReplicatedHashMap<String, MergingValueHolder<LinkedList<Object>>>(channel);
 			ReplicatedHashMap<String, ReplicatedList<Object>> replMap = new ReplicatedHashMap<String, ReplicatedList<Object>>(channel);
 			replMap.start(10000);
+			//System.out.println("Top protocol "+replMap.getChannel().getProtocolStack().findProtocol("DISCARD").getName());
 			// If synchronized facade needed
 			//map = ReplicatedHashMap.synchronizedMap(replMap);
 			map = replMap;
@@ -92,7 +93,7 @@ public class ReplicatedKnowledgeRepository extends KnowledgeRepository {
 		vals= (List<Object>) DeepCopy.copy(vals);
 		return vals.toArray();
 	}
-
+		
 	@Override
 	public void put(String entryKey, Object value, ISession session)
 			throws KRExceptionAccessError {
@@ -100,6 +101,7 @@ public class ReplicatedKnowledgeRepository extends KnowledgeRepository {
 		if (vals == null) {
 			vals = new ReplicatedList<Object>();
 		}
+		vals= (ReplicatedList<Object>) DeepCopy.copy(vals);
 		vals.add(value);
 		map.put(entryKey, vals);
 	}
@@ -118,7 +120,6 @@ public class ReplicatedKnowledgeRepository extends KnowledgeRepository {
 			vals.clear();
 			map.replace(entryKey,vals);
 		}
-
 		return vals.toArray();
 	}
 

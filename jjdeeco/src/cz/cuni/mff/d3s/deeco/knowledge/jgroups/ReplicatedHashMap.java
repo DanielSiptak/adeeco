@@ -51,10 +51,10 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * @author Bela Ban
  */
 @Unsupported(comment="Use JBossCache instead")
-public class ReplicatedHashMap<K extends Serializable, V extends IVersioning> extends
+public class ReplicatedHashMap<K extends Serializable, V extends IMerging> extends
         AbstractMap<K,V> implements ConcurrentMap<K,V>, ExtendedReceiver, ReplicatedMap<K,V> {
 	
-    public interface Notification<K extends Serializable, V extends IVersioning> {
+    public interface Notification<K extends Serializable, V extends IMerging> {
         void entrySet(K key, V value);
         
         void entryReplaced(K key,V value);
@@ -110,7 +110,7 @@ public class ReplicatedHashMap<K extends Serializable, V extends IVersioning> ex
     private Channel channel;
     protected RpcDispatcher disp=null;
     private String cluster_name=null;
-    // to be notified when mbrship changes
+    // to be notified when membership changes
     private final Set<Notification> notifs=new CopyOnWriteArraySet<Notification>();
     private final Vector<Address> members=new Vector<Address>(); // keeps track of all DHTs
     private boolean persistent=false; // whether to use PersistenceManager to save state
@@ -348,21 +348,6 @@ public class ReplicatedHashMap<K extends Serializable, V extends IVersioning> ex
         }
     }
 
-    private V getNewer(V inserted,V current){
-    	return (isNewer(inserted,current)) ? inserted : current;
-    }
-    
-    private boolean isNewer(V inserted, V current) {
-		
-		if (inserted != null&&current != null) {
-			return inserted.getVersion() > current.getVersion();
-		}
-		if (current == null) {
-			return true;
-		}
-		return false;
-	}
-
 	/**
      * Maps the specified key to the specified value in this table. Neither the
      * key nor the value can be null. <p/>
@@ -381,7 +366,6 @@ public class ReplicatedHashMap<K extends Serializable, V extends IVersioning> ex
      */
     public V put(K key, V value) {
         V prev_val=get(key);
-
         if(send_message) {
             try {
                 MethodCall call=new MethodCall(PUT, new Object[] { key, value });
@@ -579,19 +563,7 @@ public class ReplicatedHashMap<K extends Serializable, V extends IVersioning> ex
     /*------------------------ Callbacks -----------------------*/
 
     public V _put(K key, V value) {
-    	/**
-    	 * This is support for merging of the sub clusters
-    	 * It will override value in map only if new value has bigger modCount than the old one.
-    	 */
-    	/*
-    	V retval;
-    	if (value != null) {
-    		retval =  map.put(key,(V) value.getStamp((V)map.get(key)));
-    	} else {
-    		retval = map.put(key, value);
-    	}
-    	*/
-    	V retval = map.put(key,getNewer(value, map.get(key)));
+    	V retval = map.put(key,getMerged(key, value, map.get(key)));
         if(persistent) {
             try {
                 persistence_mgr.save(key, value);
@@ -609,7 +581,7 @@ public class ReplicatedHashMap<K extends Serializable, V extends IVersioning> ex
     }
 
     public V _putIfAbsent(K key, V value) {
-    	V retval = map.putIfAbsent(key,getNewer(value, map.get(key)));
+    	V retval = map.putIfAbsent(key,value);
         if(persistent) {
             try {
                 persistence_mgr.save(key, value);
@@ -640,7 +612,7 @@ public class ReplicatedHashMap<K extends Serializable, V extends IVersioning> ex
         // ---> super.putAll(m); <--- CULPRIT !!!@#$%$
         // That said let's do it the stupid way:
         for(Map.Entry<? extends K,? extends V> entry:map.entrySet()) {
-            this.map.put(entry.getKey(), getNewer(entry.getValue(), map.get(entry.getKey())));
+            this.map.put(entry.getKey(), entry.getValue());
         }
 
         if(persistent && !map.isEmpty()) {
@@ -747,7 +719,18 @@ public class ReplicatedHashMap<K extends Serializable, V extends IVersioning> ex
         }
         return retval;
     }
-
+    
+    private V getMerged(K key,V inserted,V current){
+    	if (inserted == null) {
+    		return null;
+    	}
+    	if (current != null)
+    		inserted.mergeWith(key, current);
+    	return inserted;
+    }
+    
+    
+    
     /*----------------------------------------------------------*/
 
     /*-------------------- State Exchange ----------------------*/
@@ -860,7 +843,64 @@ public class ReplicatedHashMap<K extends Serializable, V extends IVersioning> ex
         //if size is bigger than one, there are more peers in the group
         //otherwise there is only one server.
         send_message=members.size() > 1;
-        //TODO need to add merge
+        //TODO need to add merge handling
+        if(new_view instanceof MergeView) {
+
+            ViewHandler handler=new ViewHandler(channel, (MergeView)new_view,this);
+
+            // requires separate thread as we don't want to block JGroups
+            handler.start();
+
+        }
+    }
+    
+    private static class ViewHandler<K extends Serializable,V extends IMerging> extends Thread {
+
+        Channel channel;
+        MergeView view;
+        ReplicatedHashMap<K, V> map;
+        
+        private ViewHandler(Channel channel, MergeView view,ReplicatedHashMap<K,V> map) {
+            this.channel = channel;
+            this.view = view;
+            this.map = map;
+        }
+
+        /**
+         * from each subgroup first member resends all values in map  
+         */
+        public void run() {        	
+        	Vector<View> subGroups = view.getSubgroups();
+        	Address local_addr = channel.getAddress();
+            for (View subGroup : subGroups) {
+        		// local address is first in one of the subgroups
+            	if (subGroup.getMembers().firstElement().compareTo(local_addr)==0){
+        			for (Entry<K,V> entry : map.entrySet()){
+        				map.put(entry.getKey(), entry.getValue());
+        			}
+        		}
+			}
+        	
+        	/*
+        	Vector<View> subgroups=view.getSubgroups();
+            View tmp_view=subgroups.firstElement(); // picks the first
+            Address local_addr=channel.getAddress();
+            if(!tmp_view.getMembers().contains(local_addr)) {
+                System.out.println("Not member of the new primary partition ("
+                                   + tmp_view + "), will re-acquire the state");
+                try {
+                    channel.getState(null, 30000);
+                }
+                catch(Exception ex) {
+                }
+
+            }
+            else {
+                System.out.println("Not member of the new primary partition ("
+                                   + tmp_view + "), will do nothing");
+            }
+            */
+        }
     }
 
     /**
@@ -1081,6 +1121,12 @@ public class ReplicatedHashMap<K extends Serializable, V extends IVersioning> ex
         public V _replace(K key, V value) {
             synchronized(mutex) {
                 return map._replace(key, value);
+            }
+        }
+        
+        public V _merge(K key, V value) {
+            synchronized(mutex) {
+                return this._merge(key, value);
             }
         }
 
