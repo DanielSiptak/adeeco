@@ -32,8 +32,6 @@ import cz.cuni.mff.d3s.deeco.knowledge.ISession;
 import cz.cuni.mff.d3s.deeco.knowledge.KnowledgeRepository;
 import cz.cuni.mff.d3s.deeco.knowledge.local.DeepCopy;
 import cz.cuni.mff.d3s.deeco.scheduling.IKnowledgeChangeListener;
-import cz.cuni.mff.ms.siptak.adeecolib.service.AppMessenger;
-import cz.cuni.mff.ms.siptak.adeecolib.service.AppMessenger.AppLogger;
 
 /**
  * Implementation of the knowledge repository using a ReplicateHashMap.
@@ -52,7 +50,6 @@ public class ReplicatedKnowledgeRepository extends KnowledgeRepository {
 	private ReplicatedHashMap<String, ReplicatedList<Object>> map;// = new HashMap<String, List<Object>>();
 	private Channel channel = null;
 
-	private AppLogger logger = AppMessenger.getInstance().getLogger("ReplicatedHashMap");
 	private Map<IKnowledgeChangeListener,KnowledgeNotification> listeners = new ConcurrentHashMap<IKnowledgeChangeListener,KnowledgeNotification>(); 
 	
 	public ReplicatedKnowledgeRepository() {
@@ -66,10 +63,8 @@ public class ReplicatedKnowledgeRepository extends KnowledgeRepository {
 			// If synchronized facade needed
 			//map = ReplicatedHashMap.synchronizedMap(replMap);
 			map = replMap;
-			logger.addLog("Creating ReplicatedHashMap");
 		} catch (ChannelException e) {
 			map=null;
-			logger.addLog("Error with ReplicatedHashMap");
 			e.printStackTrace();
 		}
 	}

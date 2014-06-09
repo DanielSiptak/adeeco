@@ -21,8 +21,6 @@ import cz.cuni.mff.d3s.deeco.annotations.DEECoEnsembleMembership;
 import cz.cuni.mff.d3s.deeco.annotations.DEECoIn;
 import cz.cuni.mff.d3s.deeco.annotations.DEECoPeriodicScheduling;
 import cz.cuni.mff.d3s.deeco.ensemble.Ensemble;
-import cz.cuni.mff.ms.siptak.adeecolib.service.AppMessenger;
-import cz.cuni.mff.ms.siptak.adeecolib.service.AppMessenger.AppLogger;
 
 /**
  * Sample ensemble class.
@@ -59,7 +57,5 @@ public class AlertEnsemble extends Ensemble {
 			@DEECoIn("member.loadRatio") Float loadRatio) {
 		String text = mId + " overloaded with " + Math.round(loadRatio * 100) + "%";
 		System.out.println(text);
-		AppLogger logger = AppMessenger.getInstance().getLogger("AlertEnsemble");
-		logger.addLog(text);
 	}
 }

@@ -13,7 +13,9 @@ To deploy and run ADEECo application
 ##Used projects
 - JDEECo version before introducing Java 1.7 version functionality
 - JGroups version 2.12.0.Alpha3 ported for Android
+- EventBus version 2.2.1
 - android-support-v7-appcompat for compatibility with lower versions of Android
+
 
 ##Build and deploy
 To build the project these steps are needed
@@ -21,28 +23,24 @@ To build the project these steps are needed
 - Download and install current version of Android SDK
 - Checkout source code from [https://github.com/DanielSiptak/adeeco.git] 
 - Import projects to eclipse with Android SDK and ADT support
-- Android activity to run `AdeecoActivity.java` in `cz.cuni.mff.ms.dsiptak.adeecolib` package
+- Android activity to run `AdeecoActivity.java` in `cz.cuni.mff.ms.dsiptak.adeeco` package
 - Create new `Android Virtual Device` with Android version higher than HoneyComb (Android 3.0)
 
 ## Project structure
 There are several eclipse projects currently available.
-- `AdeecoLib` Main project combining jdeeco source code with android application code.
+- `Adeeco` Main project combining jjdeeco project with android application code.
 - `android-support-v7-appcompat` Support project to enable compatibility for versions below 3.0 (Currently disabled)
-- `jjdeeco` Support project for developing jGroups based knowledge repository for JDEECo.
-
-`jjdeeco` project is standard java project and therefore it can be run without Android environment. This is easing developing of Jgroups knowledge repository.
-Currently the source code has to be manually synchronized to `AdeecoLib` but this will be changed.
+- `jjdeeco` Support project for developing jGroups based knowledge repository for JDEECo and servers as source for Adeeco project.
 
 ##Demo application
-Current `AdeecoLib` application is serving as demo for starting cloud demo from JDEECo.
+Current `Adeeco` application is serving as demo for starting cloud demo from JDEECo.
 It is starting components and ensembles independently of each other.
 
 ##Development status
-ADEECo is fully working on device locally.
-JGroups implementation of Knowledge Repository is under development 
-and with it possibility for multi device communication.
- 
+Currently Replication and Merging of multiple deveice is working.
+Creation of eventbus enviroment and locking is to be done.
 
+ 
 ##References
 
 * https://github.com/d3scomp/JDEECo

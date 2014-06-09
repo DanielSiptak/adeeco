@@ -24,8 +24,6 @@ import cz.cuni.mff.d3s.deeco.annotations.DEECoOut;
 import cz.cuni.mff.d3s.deeco.annotations.DEECoPeriodicScheduling;
 import cz.cuni.mff.d3s.deeco.ensemble.Ensemble;
 import cz.cuni.mff.d3s.deeco.knowledge.OutWrapper;
-import cz.cuni.mff.ms.siptak.adeecolib.service.AppMessenger;
-import cz.cuni.mff.ms.siptak.adeecolib.service.AppMessenger.AppLogger;
 
 /**
  * Sample ensemble class.
@@ -70,8 +68,6 @@ public class MigrationEnsemble extends Ensemble {
 		cLoad.item=avarage;
 		String text = "Balance load from "+mId+" to " + cId;
 		System.out.println(text);
-		AppLogger logger = AppMessenger.getInstance().getLogger("MigrationEnsemble");
-		logger.addLog(text);
 	}
 	
 

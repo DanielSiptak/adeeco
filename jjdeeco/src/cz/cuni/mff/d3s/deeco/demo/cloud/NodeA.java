@@ -20,8 +20,6 @@ import java.util.Random;
 import cz.cuni.mff.d3s.deeco.annotations.*;
 import cz.cuni.mff.d3s.deeco.knowledge.ComponentKnowledge;
 import cz.cuni.mff.d3s.deeco.knowledge.OutWrapper;
-import cz.cuni.mff.ms.siptak.adeecolib.service.AppMessenger;
-import cz.cuni.mff.ms.siptak.adeecolib.service.AppMessenger.AppLogger;
 
 @DEECoComponent
 public class NodeA extends ComponentKnowledge {
@@ -53,7 +51,5 @@ public class NodeA extends ComponentKnowledge {
 		loadRatio.item = new Random().nextFloat();
 		String text = id+" load from "+Math.round(old * 100)+ "% to "+Math.round(loadRatio.item * 100)+"%";
 		System.out.println(text);
-		AppLogger logger = AppMessenger.getInstance().getLogger(id);
-		logger.addLog(text);
 	}
 }
