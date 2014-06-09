@@ -56,7 +56,6 @@ public class ReplicatedKnowledgeRepository extends KnowledgeRepository {
 	
 	public ReplicatedKnowledgeRepository() {
 		try {
-			
 			System.setProperty("java.net.preferIPv4Stack" , "true");
 			channel = new JChannel("assets/udp.xml");
 			channel.connect("Adeeco");

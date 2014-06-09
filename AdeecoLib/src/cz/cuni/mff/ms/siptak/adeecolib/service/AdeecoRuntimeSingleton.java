@@ -6,13 +6,17 @@ import java.util.List;
 import java.util.Map;
 
 import cz.cuni.mff.d3s.deeco.knowledge.KnowledgeManager;
+import cz.cuni.mff.d3s.deeco.knowledge.KnowledgeRepository;
 import cz.cuni.mff.d3s.deeco.knowledge.LoggingKnowledgeRepository;
 import cz.cuni.mff.d3s.deeco.knowledge.RepositoryKnowledgeManager;
+import cz.cuni.mff.d3s.deeco.knowledge.jgroups.KnowledgeNotification;
 import cz.cuni.mff.d3s.deeco.knowledge.jgroups.ReplicatedKnowledgeRepository;
+import cz.cuni.mff.d3s.deeco.knowledge.jgroups.ReplicatedHashMap.Notification;
 import cz.cuni.mff.d3s.deeco.knowledge.local.LocalKnowledgeRepository;
 import cz.cuni.mff.d3s.deeco.provider.AbstractDEECoObjectProvider;
 import cz.cuni.mff.d3s.deeco.provider.ClassDEECoObjectProvider;
 import cz.cuni.mff.d3s.deeco.runtime.Runtime;
+import cz.cuni.mff.d3s.deeco.scheduling.IKnowledgeChangeListener;
 import cz.cuni.mff.d3s.deeco.scheduling.MultithreadedScheduler;
 import cz.cuni.mff.d3s.deeco.scheduling.Scheduler;
 
@@ -23,20 +27,20 @@ public class AdeecoRuntimeSingleton {
 	private Scheduler sched;
 	private KnowledgeManager km;
 	private Map<String, RuntimeBundle> bundles;
+	private KnowledgeRepository kr;
 	
 	private void initilizeRuntime() {
 		boolean replicated=true;
 		if (km==null) {
-			if (!replicated) {
-				km = new RepositoryKnowledgeManager(
-						new LocalKnowledgeRepository());
-			} else {
-				km = new RepositoryKnowledgeManager(
-						new LoggingKnowledgeRepository(
-								new ReplicatedKnowledgeRepository()
-								,true)
-						);
+			if (kr == null) {
+				if (!replicated) {
+					kr = new LocalKnowledgeRepository();
+				} else {
+				    kr = new ReplicatedKnowledgeRepository();
+				}
 			}
+			//kr = new LoggingKnowledgeRepository(kr);
+			km = new RepositoryKnowledgeManager(kr);
 		} else {
 			//TODO clean the km need to add it to knowledge interface
 		}
@@ -75,7 +79,7 @@ public class AdeecoRuntimeSingleton {
 
 	public void destroyRuntime() {
 		rt.stopRuntime();
-		initilizeRuntime(); // this will create whole new deeco runtime
+		initilizeRuntime(); // this will create whole new deeco runtime //TODO
 		bundles.clear();
 	}
 
@@ -106,6 +110,22 @@ public class AdeecoRuntimeSingleton {
 
 	public List<String> getBoundleIds() {
 		return new ArrayList<String>(bundles.keySet());
+	}
+	
+	public boolean registerListener(IKnowledgeChangeListener listener) {
+		return kr.registerListener(listener);
+	}
+
+	public void setListenersActive(boolean on) {
+		kr.setListenersActive(on);
+	}
+
+	public boolean isListenersActive() {
+		return kr.isListenersActive();
+	}
+
+	public boolean unregisterListener(IKnowledgeChangeListener listener) {
+		return kr.unregisterListener(listener);
 	}
 	
 }

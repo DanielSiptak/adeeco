@@ -46,12 +46,12 @@
          oob_thread_pool.queue_enabled="false"
          oob_thread_pool.queue_max_size="100"
          oob_thread_pool.rejection_policy="Run"/>
-    <DISCARD use_gui="true" down="1"/>
-    <BPING timeout="3000"
-    		num_ping_requests="3"
-            num_initial_members="2"/>
-    <MERGE2 max_interval="15000"
-            min_interval="10000"/>
+
+    <BPING timeout="3000" />
+    		<!-- num_ping_requests="3" />
+            num_initial_members="2"/> -->
+    <MERGE2 max_interval="10000"
+            min_interval="3000"/>
     <FD_SOCK/>
     <FD_ALL/>
     <VERIFY_SUSPECT timeout="1500"  />
@@ -74,5 +74,4 @@
     <!--pbcast.STREAMING_STATE_TRANSFER /-->
     <pbcast.STATE_TRANSFER  />
     <!-- pbcast.FLUSH  /-->
-    
 </config>

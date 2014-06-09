@@ -1,11 +1,44 @@
 package cz.cuni.mff.d3s.deeco.knowledge.jgroups;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 import cz.cuni.mff.d3s.deeco.knowledge.ISession;
 
-class ReplicatedSession implements ISession {
+class ReplicatedSession<K extends Serializable, V extends IMerging> implements ISession {
 
 	private boolean succeeded = false;
 	private final ReplicatedKnowledgeRepository kr;
+	
+	private List<Action<K,V>> actions = new ArrayList<Action<K,V>>();
+	
+	private enum ActionType{
+		PUT,TAKE
+	}
+	
+	private class Action<K,V>{
+		private K key;
+		private V value;
+		private ActionType type;
+		
+		Action(ActionType type, K key, V value){
+			this.type=type;
+			this.key=key;
+			this.value=value;
+		}
+		
+		public K getKey() {
+			return key;
+		}
+		
+		public V getValue(){
+			return value;
+		}
+		public ActionType getType(){
+			return type;
+		}
+	}
 	
 	ReplicatedSession(ReplicatedKnowledgeRepository kr) {
 		this.kr = kr;
@@ -41,4 +74,13 @@ class ReplicatedSession implements ISession {
 		return succeeded;
 	}
 
+	public void storePut(K key,V value){
+		//TODO possibly remap take and put to replace
+		actions.add(new Action<K, V>(ActionType.PUT, key, value));
+	}
+	
+	public void storeTake(K key,V value){
+		actions.add(new Action<K, V>(ActionType.TAKE, key, value));
+	}
+	
 }

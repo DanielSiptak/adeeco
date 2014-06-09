@@ -115,7 +115,7 @@ public class ReplicatedHashMap<K extends Serializable, V extends IMerging> exten
     private final Vector<Address> members=new Vector<Address>(); // keeps track of all DHTs
     private boolean persistent=false; // whether to use PersistenceManager to save state
     private PersistenceManager persistence_mgr=null;
-    private boolean notifierEnabled;
+    private boolean notifierEnabled = true;
     
     /**
      * Determines when the updates have to be sent across the network, avoids

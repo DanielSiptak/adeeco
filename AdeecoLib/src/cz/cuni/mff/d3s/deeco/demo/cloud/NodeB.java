@@ -39,12 +39,11 @@ public class NodeB extends ComponentKnowledge {
 	public Float maxLoadRatio;
 	public Integer networkId;
 	public String targetNode;
-	public String id;
 
 	@DEECoInitialize
 	public static ComponentKnowledge getInitialKnowledge() {
 		NodeB k = new NodeB();
-		k.id = "Node B";
+		k.id = "NodeB";
 		k.loadRatio = 0.0f;
 		k.maxLoadRatio = 0.7f;
 		k.networkId = 1;

@@ -15,6 +15,7 @@
  ******************************************************************************/
 package cz.cuni.mff.d3s.deeco.knowledge.jgroups;
 
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +57,6 @@ public class ReplicatedKnowledgeRepository extends KnowledgeRepository {
 	
 	public ReplicatedKnowledgeRepository() {
 		try {
-			
 			System.setProperty("java.net.preferIPv4Stack" , "true");
 			channel = new JChannel("assets/udp.xml");
 			channel.connect("Adeeco");
@@ -94,6 +94,10 @@ public class ReplicatedKnowledgeRepository extends KnowledgeRepository {
 		return vals.toArray();
 	}
 		
+	private ReplicatedSession<Serializable, IMerging> getSession(ISession session){
+		return (ReplicatedSession<Serializable, IMerging>)session;
+	}
+	
 	@Override
 	public void put(String entryKey, Object value, ISession session)
 			throws KRExceptionAccessError {
@@ -103,6 +107,7 @@ public class ReplicatedKnowledgeRepository extends KnowledgeRepository {
 		}
 		vals= (ReplicatedList<Object>) DeepCopy.copy(vals);
 		vals.add(value);
+		//getSession(session).put(entryKey, vals);
 		map.put(entryKey, vals);
 	}
 
@@ -118,6 +123,7 @@ public class ReplicatedKnowledgeRepository extends KnowledgeRepository {
 
 		if (vals.size() <= 1) {
 			vals.clear();
+			//getSession(session).take(entryKey, vals);
 			map.replace(entryKey,vals);
 		}
 		return vals.toArray();
@@ -125,7 +131,7 @@ public class ReplicatedKnowledgeRepository extends KnowledgeRepository {
 
 	@Override
 	public ISession createSession() {
-		return new ReplicatedSession(this);
+		return new ReplicatedSession<String, ReplicatedList<Object>>(this,map);
 	}
 
 	@Override

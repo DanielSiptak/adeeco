@@ -1,5 +1,10 @@
 package cz.cuni.mff.ms.siptak.adeecolib.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import cz.cuni.mff.d3s.deeco.scheduling.ETriggerType;
+import cz.cuni.mff.d3s.deeco.scheduling.IKnowledgeChangeListener;
 import cz.cuni.mff.ms.siptak.adeecolib.AdeecoActivity;
 import cz.cuni.mff.ms.siptak.adeecolib.R;
 import android.annotation.SuppressLint;
@@ -29,7 +34,7 @@ public class AdeecoService extends Service {
 	/**
 	 * Instance of Adeeco runtime singleton used for this service
 	 */
-	private AdeecoRuntimeSingleton run = AdeecoRuntimeSingleton.getInstance();
+	private AdeecoRuntimeSingleton run;
 
 	/**
 	 * Target we publish for activity to send messages to IncomingHandler.
@@ -87,7 +92,8 @@ public class AdeecoService extends Service {
 	@Override
 	public void onCreate() {
 		mNM = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-
+		
+		run = AdeecoRuntimeSingleton.getInstance();
 		// Display a notification about us starting.
 		showNotification();
 		AppMessenger.getInstance().setServiceMessenger(mMessenger);

@@ -16,6 +16,10 @@ import java.util.Set;
 public class ReplicatedList<T> extends LinkedList<T> implements IMerging {
 
 	private static final long serialVersionUID = 1L;
+	
+	protected int version = 0;
+	
+	
 	/*
 	private MergingFunctor<T> merger;
 	public abstract class MergingFunctor<F>{
@@ -28,13 +32,12 @@ public class ReplicatedList<T> extends LinkedList<T> implements IMerging {
 		return super.toString()+" ["+this.version+"]";
 	}
 	
-	protected int version = 0;
-	
 	@Override
 	public void mergeWith(Serializable key, IMerging stored) {
 		if (stored instanceof ReplicatedList<?>){
 			ReplicatedList<T> repStored = (ReplicatedList<T>) stored;
-			System.out.println("Merge "+key+" ["+this.version+"] vs ["+repStored.version+"]");
+			//System.out.println("Merge "+key+" ["+this.version+"] vs ["+repStored.version+"]");
+			/** in case of key id we do the merge of the replicated lists */
 			if (key.equals("id")) {
 				Set<T> set = new HashSet<T>(this);
 				set.addAll(repStored);

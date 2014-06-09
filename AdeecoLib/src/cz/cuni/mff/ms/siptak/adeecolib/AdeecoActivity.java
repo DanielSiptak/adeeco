@@ -17,7 +17,9 @@ import cz.cuni.mff.d3s.deeco.demo.convoy.RobotLeaderComponent;
 import cz.cuni.mff.ms.siptak.adeecolib.service.AdeecoService;
 import cz.cuni.mff.ms.siptak.adeecolib.service.AppMessenger;
 import cz.cuni.mff.ms.siptak.adeecolib.service.AppMessenger.ACTIVITY;
+import cz.cuni.mff.ms.siptak.adeecolib.service.AppMessenger.AppLogger;
 import cz.cuni.mff.ms.siptak.adeecolib.service.RuntimeBundle;
+import de.greenrobot.event.EventBus;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.MulticastLock;
 import android.os.Bundle;
@@ -97,6 +99,7 @@ public class AdeecoActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		EventBus.getDefault().register(this);
 		setContentView(R.layout.activity_adeeco);
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(this);
@@ -118,6 +121,10 @@ public class AdeecoActivity extends Activity {
 		lock = wifi.createMulticastLock("adeeco");
 		lock.setReferenceCounted(true);
 		lock.acquire();
+	}
+	
+	public void onEventMainThread(ChangedKnowledgeEvent event){
+		System.err.println("Event received "+event.getKey()+" : "+event.getValue());
 	}
 	
 	@Override
