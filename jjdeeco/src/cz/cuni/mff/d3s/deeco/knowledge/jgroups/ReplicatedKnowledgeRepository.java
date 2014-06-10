@@ -19,19 +19,25 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.jgroups.Address;
 import org.jgroups.Channel;
 import org.jgroups.ChannelException;
 import org.jgroups.JChannel;
+import org.jgroups.View;
 
 import cz.cuni.mff.d3s.deeco.exceptions.KRExceptionAccessError;
 import cz.cuni.mff.d3s.deeco.exceptions.KRExceptionUnavailableEntry;
 import cz.cuni.mff.d3s.deeco.knowledge.ISession;
 import cz.cuni.mff.d3s.deeco.knowledge.KnowledgeRepository;
+import cz.cuni.mff.d3s.deeco.knowledge.jgroups.ReplicatedHashMap.Notification;
 import cz.cuni.mff.d3s.deeco.knowledge.local.DeepCopy;
 import cz.cuni.mff.d3s.deeco.scheduling.IKnowledgeChangeListener;
+import cz.cuni.mff.d3s.events.ChangedKnowledgeEvent;
+import cz.cuni.mff.d3s.events.EventFactory;
 
 /**
  * Implementation of the knowledge repository using a ReplicateHashMap.
@@ -41,12 +47,8 @@ import cz.cuni.mff.d3s.deeco.scheduling.IKnowledgeChangeListener;
  */
 public class ReplicatedKnowledgeRepository extends KnowledgeRepository {
 
-	//protected class ReplicatedKnowledgeList<Object> implements ReplicatedList<Object>(){};
-		
-		
-	
 	final ReentrantLock lock = new ReentrantLock();
-	//private ReplicatedHashMap<String, MergingValueHolder<LinkedList<Object>>> map;// = new HashMap<String, List<Object>>();
+	
 	private ReplicatedHashMap<String, ReplicatedList<Object>> map;// = new HashMap<String, List<Object>>();
 	private Channel channel = null;
 
@@ -59,6 +61,45 @@ public class ReplicatedKnowledgeRepository extends KnowledgeRepository {
 			channel.connect("Adeeco");
 			ReplicatedHashMap<String, ReplicatedList<Object>> replMap = new ReplicatedHashMap<String, ReplicatedList<Object>>(channel);
 			replMap.start(10000);
+			//replMap.addNotifier(new Notification<Serializable, IMerging>() {});
+			Notification<String, ReplicatedList<Object>> notif = new Notification<String, ReplicatedList<Object>>(){
+
+				@Override
+				public void entrySet(String key, ReplicatedList<Object> value) {
+					EventFactory.getEventBus().post(new ChangedKnowledgeEvent(key, value));
+				}
+
+				@Override
+				public void entryReplaced(String key,
+						ReplicatedList<Object> value) {
+					
+				}
+
+				@Override
+				public void entryRemoved(String key) {
+					
+				}
+
+				@Override
+				public void viewChange(View view, Vector<Address> mbrs_joined,
+						Vector<Address> mbrs_left) {
+					
+				}
+
+				@Override
+				public void contentsSet(
+						Map<String, ReplicatedList<Object>> new_entries) {
+					
+				}
+
+				@Override
+				public void contentsCleared() {
+					
+				}
+			
+			};
+			replMap.addNotifier(notif);
+			
 			//System.out.println("Top protocol "+replMap.getChannel().getProtocolStack().findProtocol("DISCARD").getName());
 			// If synchronized facade needed
 			//map = ReplicatedHashMap.synchronizedMap(replMap);

@@ -374,8 +374,7 @@ public class ReplicatedHashMap<K extends Serializable, V extends IMerging> exten
             } catch(Throwable e) {
                 throw new RuntimeException("put(" + key + ", " + value + ") failed", e);
 			}
-        }
-        else {
+        } else {
             return _put(key, value);
         }
         return prev_val;

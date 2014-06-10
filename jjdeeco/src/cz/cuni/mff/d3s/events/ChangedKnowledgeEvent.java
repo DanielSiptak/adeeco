@@ -1,4 +1,4 @@
-package cz.cuni.mff.ms.siptak.adeeco;
+package cz.cuni.mff.d3s.events;
 
 public class ChangedKnowledgeEvent {
 	String key;

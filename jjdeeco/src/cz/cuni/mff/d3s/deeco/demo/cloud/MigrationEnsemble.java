@@ -24,6 +24,8 @@ import cz.cuni.mff.d3s.deeco.annotations.DEECoOut;
 import cz.cuni.mff.d3s.deeco.annotations.DEECoPeriodicScheduling;
 import cz.cuni.mff.d3s.deeco.ensemble.Ensemble;
 import cz.cuni.mff.d3s.deeco.knowledge.OutWrapper;
+import cz.cuni.mff.d3s.events.EventFactory;
+import cz.cuni.mff.d3s.events.MessageEvent;
 
 /**
  * Sample ensemble class.
@@ -68,6 +70,7 @@ public class MigrationEnsemble extends Ensemble {
 		cLoad.item=avarage;
 		String text = "Balance load from "+mId+" to " + cId;
 		System.out.println(text);
+		EventFactory.getEventBus().post(new MessageEvent("Migration", text));
 	}
 	
 

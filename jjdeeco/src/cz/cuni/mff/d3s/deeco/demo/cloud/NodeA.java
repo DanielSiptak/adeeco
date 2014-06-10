@@ -15,11 +15,15 @@
  ******************************************************************************/
 package cz.cuni.mff.d3s.deeco.demo.cloud;
 
+import java.awt.Event;
 import java.util.Random;
 
 import cz.cuni.mff.d3s.deeco.annotations.*;
 import cz.cuni.mff.d3s.deeco.knowledge.ComponentKnowledge;
 import cz.cuni.mff.d3s.deeco.knowledge.OutWrapper;
+import cz.cuni.mff.d3s.events.ChangedKnowledgeEvent;
+import cz.cuni.mff.d3s.events.EventFactory;
+import cz.cuni.mff.d3s.events.MessageEvent;
 
 @DEECoComponent
 public class NodeA extends ComponentKnowledge {
@@ -51,5 +55,8 @@ public class NodeA extends ComponentKnowledge {
 		loadRatio.item = new Random().nextFloat();
 		String text = id+" load from "+Math.round(old * 100)+ "% to "+Math.round(loadRatio.item * 100)+"%";
 		System.out.println(text);
+		//EventBus.getDefault().post(new ChangedKnowledgeEvent("NodeA", text));
+		//EventBus.getDefault().post(new ChangedKnowledgeEvent("NodeA", text));
+		EventFactory.getEventBus().post(new MessageEvent(id, text));
 	}
 }

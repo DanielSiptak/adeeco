@@ -62,6 +62,7 @@ public class ParameterizedMethod {
       return method.invoke(null, parameters);
     } catch (Exception e) {
       System.out.println("Method invocation error: " + e.getMessage());
+      e.printStackTrace();
       return null;
     }
   }

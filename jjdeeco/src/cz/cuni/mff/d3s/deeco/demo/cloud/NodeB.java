@@ -25,6 +25,8 @@ import cz.cuni.mff.d3s.deeco.annotations.DEECoPeriodicScheduling;
 import cz.cuni.mff.d3s.deeco.annotations.DEECoProcess;
 import cz.cuni.mff.d3s.deeco.knowledge.OutWrapper;
 import cz.cuni.mff.d3s.deeco.knowledge.ComponentKnowledge;
+import cz.cuni.mff.d3s.events.EventFactory;
+import cz.cuni.mff.d3s.events.MessageEvent;
 
 @DEECoComponent
 public class NodeB extends ComponentKnowledge {
@@ -56,5 +58,6 @@ public class NodeB extends ComponentKnowledge {
 		loadRatio.item = new Random().nextFloat();
 		String text = id+" load from "+Math.round(old * 100)+ "% to "+Math.round(loadRatio.item * 100)+"%";
 		System.out.println(text);
+		EventFactory.getEventBus().post(new MessageEvent(id, text));
 	}
 }

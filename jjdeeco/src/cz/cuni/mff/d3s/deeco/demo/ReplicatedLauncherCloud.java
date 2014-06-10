@@ -14,6 +14,7 @@ import cz.cuni.mff.d3s.deeco.provider.ClassDEECoObjectProvider;
 import cz.cuni.mff.d3s.deeco.runtime.Runtime;
 import cz.cuni.mff.d3s.deeco.scheduling.MultithreadedScheduler;
 import cz.cuni.mff.d3s.deeco.scheduling.Scheduler;
+import cz.cuni.mff.d3s.events.ChangedKnowledgeEvent;
 
 /**
  * Main class for launching the application.
@@ -27,6 +28,7 @@ public class ReplicatedLauncherCloud {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		
 		List<Class<?>> components = Arrays.asList(new Class<?>[]{NodeA.class});
 		List<Class<?>> ensembles = Arrays.asList(new Class<?>[]{ AlertEnsemble.class});
 		

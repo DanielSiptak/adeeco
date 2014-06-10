@@ -14,6 +14,7 @@ import cz.cuni.mff.d3s.deeco.demo.cloud.NodeB;
 import cz.cuni.mff.d3s.deeco.demo.convoy.ConvoyEnsemble;
 import cz.cuni.mff.d3s.deeco.demo.convoy.RobotFollowerComponent;
 import cz.cuni.mff.d3s.deeco.demo.convoy.RobotLeaderComponent;
+import cz.cuni.mff.d3s.events.ChangedKnowledgeEvent;
 import cz.cuni.mff.ms.siptak.adeeco.service.AdeecoService;
 import cz.cuni.mff.ms.siptak.adeeco.service.AppMessenger;
 import cz.cuni.mff.ms.siptak.adeeco.service.RuntimeBundle;
