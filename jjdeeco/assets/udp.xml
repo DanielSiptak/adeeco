@@ -47,9 +47,9 @@
          oob_thread_pool.queue_max_size="100"
          oob_thread_pool.rejection_policy="Run"/>
 
-    <BPING timeout="3000" />
-    		<!-- num_ping_requests="3" />
-            num_initial_members="2"/> -->
+    <BPING timeout="3000"
+    		num_ping_requests="3" 
+            num_initial_members="2"/>
     <MERGE2 max_interval="10000"
             min_interval="3000"/>
     <FD_SOCK/>

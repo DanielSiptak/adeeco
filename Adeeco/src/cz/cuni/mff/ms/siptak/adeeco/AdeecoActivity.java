@@ -73,28 +73,13 @@ public class AdeecoActivity extends Activity {
 	AppMessenger appMessenger = AppMessenger.getInstance();
 	
 	/**
-	 * Map of listeners on activity side
-	 */
-	@SuppressLint("UseSparseArrays") 
-	Map<Integer, Set<OnEventListener>> mOnEventListeners = new HashMap<Integer, Set<OnEventListener>>();
-	
-	/**
 	 * Handler of incoming messages from service.
 	 */
 	@SuppressLint("HandlerLeak")
 	class IncomingHandler extends Handler {
 		@Override
 		public void handleMessage(Message msg) {
-			
-			Set<OnEventListener> listeners = getOnEventListeners(msg.what);
-			if (listeners!=null) {
-				Bundle bundle = (Bundle) msg.getData();
-				for (OnEventListener listener : listeners) {
-						listener.onEventAction(bundle);
-				}
-			} else {
-				super.handleMessage(msg);
-			}
+			super.handleMessage(msg);
 		}
 	}
 
@@ -109,10 +94,6 @@ public class AdeecoActivity extends Activity {
 			setServiceStatus(true);
 		}
 		
-		logView = (LogView) findViewById(R.id.logView1);
-		if (logView!=null) {
-			addOnEventListener(ACTIVITY.LOG.ordinal(),logView.getOnEventListener());
-		}
 		if (savedInstanceState!=null) {
 			onRestoreInstanceState(savedInstanceState);
 		}
@@ -194,6 +175,9 @@ public class AdeecoActivity extends Activity {
 	private void setServiceStatus(boolean shouldRun) {
 		if (shouldRun && !isServiceRunning()) {
 			// we want service running but it is not -> starting
+			
+			Toast.makeText(this, "Starting service", Toast.LENGTH_SHORT).show();
+			System.out.println("make text");
 			final Activity act = this;
 			Thread t = new Thread(){
 				public void run(){
@@ -204,7 +188,7 @@ public class AdeecoActivity extends Activity {
 							Context.BIND_AUTO_CREATE);	
 				}
 				};
-				t.start();
+			t.start();
 		} else if (!shouldRun && isServiceRunning()) {
 			// we want service stopped but it is not -> stopping
 			unbindService(mConnection); // we need to unbind so service will not
@@ -248,45 +232,6 @@ public class AdeecoActivity extends Activity {
 		return super.onPrepareOptionsMenu(menu);
 	}
 	
-	/** EVENT LISTENER */
-	public void addOnEventListener(Integer tag, OnEventListener listener) {
-		if (!mOnEventListeners.containsKey(tag)) {
-			mOnEventListeners.put(tag, new HashSet<OnEventListener>());
-		}
-		mOnEventListeners.get(tag).add(listener);
-	}
-
-	public void setOnEventListener(OnEventListener listener) {
-		addOnEventListener(ALL_TAG, listener);
-	}
-
-	/**
-	 * Returns list of listeners that should be called for @tag
-	 * 
-	 * @param tag
-	 * @return
-	 */
-	private Set<OnEventListener> getOnEventListeners(Integer tag) {
-		Set<OnEventListener> set = new HashSet<OnEventListener>();
-		if (mOnEventListeners.containsKey(tag)) {
-			for (OnEventListener listener : mOnEventListeners.get(tag)) {
-				set.add(listener);
-			}	
-		}
-		if (mOnEventListeners.containsKey(ALL_TAG)) {
-			for (OnEventListener listener : mOnEventListeners.get(ALL_TAG)) {
-				set.add(listener);
-			}
-		}
-		return set;
-	}
-
-	public void removeOnEventListener(OnEventListener listener) {
-		for (Set<OnEventListener> set : mOnEventListeners.values()) {
-			set.remove(listener);
-		}
-	}
-
 	public void startRuntime(View view) {
 		sendMessageToService(AppMessenger.SERVICE.RUNTIME_START, null);
 		Button button = (Button) view;

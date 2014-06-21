@@ -2,11 +2,8 @@ package cz.cuni.mff.ms.siptak.adeeco;
 
 import cz.cuni.mff.d3s.events.ChangedKnowledgeEvent;
 import cz.cuni.mff.d3s.events.MessageEvent;
-import cz.cuni.mff.ms.siptak.adeeco.service.AppMessenger;
-import cz.cuni.mff.ms.siptak.adeeco.service.AppMessenger.LogLine;
 import de.greenrobot.event.EventBus;
 import android.content.Context;
-import android.os.Bundle;
 import android.text.Layout;
 import android.util.AttributeSet;
 import android.widget.TextView;
@@ -50,19 +47,6 @@ public class LogView extends TextView {
 	
 	public void onEventMainThread(MessageEvent event){
 		addStringLine(event.getKey()+" : "+event.getValue());
-	}
-	
-	public OnEventListener getOnEventListener(){
-		return new OnEventListener() {
-			
-			@Override
-			public void onEventAction(Bundle bundle) {
-				LogLine logLine = (LogLine) bundle.getSerializable(AppMessenger.LOG_STRING);
-				if (logLine!=null) {
-					addStringLine(logLine.getText());
-				}
-			}
-		};
 	}
 }
 

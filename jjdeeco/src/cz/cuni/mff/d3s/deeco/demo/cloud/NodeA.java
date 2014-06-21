@@ -42,7 +42,7 @@ public class NodeA extends ComponentKnowledge {
 		NodeA k = new NodeA();
 		k.id = "NodeA";
 		k.loadRatio = 0.0f;
-		k.maxLoadRatio = 0.7f;
+		k.maxLoadRatio = 0.5f;
 		k.networkId = 1;
 		k.targetNode = null;
 		return k;

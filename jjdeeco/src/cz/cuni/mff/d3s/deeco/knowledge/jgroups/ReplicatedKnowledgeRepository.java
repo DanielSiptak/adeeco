@@ -61,7 +61,6 @@ public class ReplicatedKnowledgeRepository extends KnowledgeRepository {
 			channel.connect("Adeeco");
 			ReplicatedHashMap<String, ReplicatedList<Object>> replMap = new ReplicatedHashMap<String, ReplicatedList<Object>>(channel);
 			replMap.start(10000);
-			//replMap.addNotifier(new Notification<Serializable, IMerging>() {});
 			Notification<String, ReplicatedList<Object>> notif = new Notification<String, ReplicatedList<Object>>(){
 
 				@Override
@@ -102,7 +101,6 @@ public class ReplicatedKnowledgeRepository extends KnowledgeRepository {
 			
 			//System.out.println("Top protocol "+replMap.getChannel().getProtocolStack().findProtocol("DISCARD").getName());
 			// If synchronized facade needed
-			//map = ReplicatedHashMap.synchronizedMap(replMap);
 			map = replMap;
 		} catch (ChannelException e) {
 			map=null;
@@ -121,17 +119,19 @@ public class ReplicatedKnowledgeRepository extends KnowledgeRepository {
 		}
 		List<Object> vals = holder.get();
 		*/
-		List<Object> vals = map.get(entryKey);
+		//List<Object> vals = map.get(entryKey);
+		List<Object> vals = getSession(session).get(entryKey);
 		if (vals == null) {
 			throw new KRExceptionUnavailableEntry("Key " + entryKey
 					+ " is not in the knowledge repository.");
 		}
 		vals= (List<Object>) DeepCopy.copy(vals);
+		
 		return vals.toArray();
 	}
 		
-	private ReplicatedSession<Serializable, IMerging> getSession(ISession session){
-		return (ReplicatedSession<Serializable, IMerging>)session;
+	private ReplicatedSession<String, ReplicatedList<Object>> getSession(ISession session){
+		return (ReplicatedSession<String, ReplicatedList<Object>>)session;
 	}
 	
 	@Override
@@ -141,10 +141,10 @@ public class ReplicatedKnowledgeRepository extends KnowledgeRepository {
 		if (vals == null) {
 			vals = new ReplicatedList<Object>();
 		}
-		vals= (ReplicatedList<Object>) DeepCopy.copy(vals);
+		vals = (ReplicatedList<Object>) DeepCopy.copy(vals);
 		vals.add(value);
-		//getSession(session).put(entryKey, vals);
-		map.put(entryKey, vals);
+		getSession(session).put(entryKey, vals);
+		//map.put(entryKey, vals);
 	}
 
 	@Override
@@ -159,8 +159,8 @@ public class ReplicatedKnowledgeRepository extends KnowledgeRepository {
 
 		if (vals.size() <= 1) {
 			vals.clear();
-			//getSession(session).take(entryKey, vals);
-			map.replace(entryKey,vals);
+			getSession(session).take(entryKey);
+			//map.replace(entryKey,vals);
 		}
 		return vals.toArray();
 	}
@@ -202,6 +202,14 @@ public class ReplicatedKnowledgeRepository extends KnowledgeRepository {
 		}
 	}
 
+	public void addNotifier(Notification notif){
+		map.addNotifier(notif);
+	}
+	
+	public void removeNotifier(Notification notif){
+		map.remove(notif);
+	}
+	
 	/**
 	 * TODO
 	 * This method is just for TestReplication scenario 

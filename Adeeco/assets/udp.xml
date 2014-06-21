@@ -19,7 +19,7 @@
          loopback="true"
          discard_incompatible_packets="true"
          max_bundle_size="64K"
-         max_bundle_timeout="30"
+         max_bundle_timeout="20"
          ip_ttl="${jgroups.udp.ip_ttl:3}"
          enable_bundling="true"
          enable_diagnostics="false"

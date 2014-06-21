@@ -1,8 +1,7 @@
 package cz.cuni.mff.d3s.deeco.knowledge.jgroups;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 import cz.cuni.mff.d3s.deeco.knowledge.ISession;
@@ -13,7 +12,7 @@ class ReplicatedSession<K extends Serializable, V extends IMerging> implements I
 	private final ReplicatedKnowledgeRepository kr;
 	private Map<K,V> map;
 	
-	private List<Action<K,V>> actions = new ArrayList<Action<K,V>>();
+	private Map<K,Action<K,V>> actions = new HashMap<K,Action<K,V>>();
 	
 	private enum ActionType{
 		PUT,TAKE
@@ -50,25 +49,19 @@ class ReplicatedSession<K extends Serializable, V extends IMerging> implements I
 	
 	@Override
 	public void begin() {
-		kr.lock.lock();
-
-		// we must break transition here because there may be no thread choices at "park/unpark"
-		Thread.yield();
+		kr.lock.lock(); // local locking between threads
 	}
 
 	@Override
 	public void end() {
-		for (Action<K,V> action : actions){
-			switch (action.getType()) {
-			case PUT:
-				//kr.put(action.getKey(),action.getValue());
-				this.map.put(action.getKey(),action.getValue());
-				break;
-
-			case TAKE:
-				this.map.put(action.getKey(),action.getValue());
-				break;
-			}
+		/** Late writing to replicated hash map
+		 * With combination with locking by JGroups 
+		 * it is possible to prevent inconsistent 
+		 * knowledge on another nodes during computation  
+		 */
+		for (Action<K,V> action : actions.values()){
+			//System.out.println("END  "+action.getKey()+" : "+action.getValue());
+			this.map.put(action.getKey(),action.getValue());
 		}
 		kr.lock.unlock();
 		succeeded = true;
@@ -90,18 +83,28 @@ class ReplicatedSession<K extends Serializable, V extends IMerging> implements I
 		return succeeded;
 	}
 
-	public void get(){
-		//TODO this has to be handled properly
-		//actions.getL
+	public V get(K key){
+		Action<K,V> action = actions.get(key);
+		if (action == null) {
+			return map.get(key);
+		} else {
+			return action.getValue();
+		}
 	}
 	
 	public void put(K key,V value){
-		//TODO possibly remap take and put to replace
-		actions.add(new Action<K, V>(ActionType.PUT, key, value));
+		actions.put(key,new Action<K, V>(ActionType.PUT, key, value));
+		//System.out.println("PUT  "+key+" : "+value);
 	}
 	
-	public void take(K key,V value){
-		actions.add(new Action<K, V>(ActionType.TAKE, key, value));
+	public V take(K key){
+		Action<K,V> action = actions.get(key);
+		V value = this.get(key);
+		if ( action != null && action.getType() == ActionType.TAKE ) {
+			value = null; //value was removed at least once before so return null
+		}
+		actions.put(key,new Action<K, V>(ActionType.TAKE, key, value));
+		//System.out.println("TAKE  "+key+" : "+value);
+		return value;
 	}
-	
 }

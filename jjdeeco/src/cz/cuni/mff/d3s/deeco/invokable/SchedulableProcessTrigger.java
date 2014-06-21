@@ -21,6 +21,7 @@ public class SchedulableProcessTrigger implements IKnowledgeChangeListener {
 	@Override
 	public void knowledgeChanged(final String triggerer,
 			final ETriggerType recMode) {
+		
 		Thread t = new Thread(new Runnable() {
 
 			@Override

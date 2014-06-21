@@ -19,7 +19,7 @@ import cz.cuni.mff.d3s.deeco.annotations.DEECoEnsemble;
 import cz.cuni.mff.d3s.deeco.annotations.DEECoEnsembleMapper;
 import cz.cuni.mff.d3s.deeco.annotations.DEECoEnsembleMembership;
 import cz.cuni.mff.d3s.deeco.annotations.DEECoIn;
-import cz.cuni.mff.d3s.deeco.annotations.DEECoPeriodicScheduling;
+import cz.cuni.mff.d3s.deeco.annotations.DEECoTrigger;
 import cz.cuni.mff.d3s.deeco.ensemble.Ensemble;
 import cz.cuni.mff.d3s.events.EventFactory;
 import cz.cuni.mff.d3s.events.MessageEvent;
@@ -31,7 +31,7 @@ import cz.cuni.mff.d3s.events.MessageEvent;
  *
  */
 @DEECoEnsemble
-@DEECoPeriodicScheduling(3000)
+//@DEECoPeriodicScheduling(5000)
 public class AlertEnsemble extends Ensemble {
 
 	/**
@@ -42,10 +42,10 @@ public class AlertEnsemble extends Ensemble {
 	@DEECoEnsembleMembership
 	public static boolean membership(
 			@DEECoIn("member.id") String mId,
-			@DEECoIn("member.loadRatio") Float mLoadRatio,
+			@DEECoIn("member.loadRatio") @DEECoTrigger Float mLoadRatio,
 			@DEECoIn("member.maxLoadRatio") Float mMaxLoadRatio,
 			@DEECoIn("coord.id") String cId) {
-		//System.out.println("[MigrationEnsemble.membership] mId = " + mId + ", mLoadRatio = " + mLoadRatio + ", mMaxLoadRatio = " + mMaxLoadRatio + ", cId = " + cId + ", cLoadRatio = " + cLoadRatio + ", cMaxLoadRatio = " + cMaxLoadRatio);
+		//System.out.println("[AlertEnsemble.membership] mId = " + mId + ", mLoadRatio = " + mLoadRatio + ", mMaxLoadRatio = " + mMaxLoadRatio + ", cId = " + cId);
 		//if (!mId.equals(cId) && mLoadRatio > mMaxLoadRatio && cLoadRatio < cMaxLoadRatio) System.out.println("[MigrationEnsemble.membership] result = true");
 		//else System.out.println("[MigrationEnsemble.membership] result = false");
 		// INJECTED ERROR

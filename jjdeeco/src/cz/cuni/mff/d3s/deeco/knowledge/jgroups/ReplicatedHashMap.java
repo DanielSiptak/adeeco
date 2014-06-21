@@ -714,7 +714,7 @@ public class ReplicatedHashMap<K extends Serializable, V extends IMerging> exten
         }
         if (notifierEnabled){
 	        for(Notification notif:notifs)
-	            notif.entrySet(key, value);
+	            notif.entryReplaced(key, value);
         }
         return retval;
     }

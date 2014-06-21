@@ -8,7 +8,9 @@ import java.util.Vector;
 
 import org.jgroups.View;
 
+import cz.cuni.mff.d3s.deeco.knowledge.KPBuilder;
 import cz.cuni.mff.d3s.deeco.knowledge.jgroups.ReplicatedHashMap.Notification;
+import cz.cuni.mff.d3s.deeco.path.grammar.EEnsembleParty;
 import cz.cuni.mff.d3s.deeco.scheduling.ETriggerType;
 import cz.cuni.mff.d3s.deeco.scheduling.IKnowledgeChangeListener;
 
@@ -17,6 +19,7 @@ public class KnowledgeNotification implements Notification{
 	IKnowledgeChangeListener listener;
 	
 	public KnowledgeNotification(IKnowledgeChangeListener listener) {
+		System.out.println("Creating trigger");
 		this.listener = listener;
 	}
 
@@ -26,10 +29,7 @@ public class KnowledgeNotification implements Notification{
 	
 	@Override
 	public void entrySet(Serializable key, IMerging value) {
-		List<String> paths = listener.getKnowledgePaths();
-		if (paths.contains(key)) {
-			listener.knowledgeChanged(key.toString(), ETriggerType.KNOWLEDGE);
-		}
+		listener.knowledgeChanged((String)key, null);
 	}
 
 	@Override
