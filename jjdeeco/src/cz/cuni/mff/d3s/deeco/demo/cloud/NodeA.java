@@ -15,13 +15,11 @@
  ******************************************************************************/
 package cz.cuni.mff.d3s.deeco.demo.cloud;
 
-import java.awt.Event;
 import java.util.Random;
 
 import cz.cuni.mff.d3s.deeco.annotations.*;
 import cz.cuni.mff.d3s.deeco.knowledge.ComponentKnowledge;
 import cz.cuni.mff.d3s.deeco.knowledge.OutWrapper;
-import cz.cuni.mff.d3s.events.ChangedKnowledgeEvent;
 import cz.cuni.mff.d3s.events.EventFactory;
 import cz.cuni.mff.d3s.events.MessageEvent;
 

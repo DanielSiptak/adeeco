@@ -19,6 +19,7 @@ import cz.cuni.mff.d3s.deeco.annotations.DEECoEnsemble;
 import cz.cuni.mff.d3s.deeco.annotations.DEECoEnsembleMapper;
 import cz.cuni.mff.d3s.deeco.annotations.DEECoEnsembleMembership;
 import cz.cuni.mff.d3s.deeco.annotations.DEECoIn;
+import cz.cuni.mff.d3s.deeco.annotations.DEECoPeriodicScheduling;
 import cz.cuni.mff.d3s.deeco.annotations.DEECoTrigger;
 import cz.cuni.mff.d3s.deeco.ensemble.Ensemble;
 import cz.cuni.mff.d3s.events.EventFactory;
@@ -31,7 +32,7 @@ import cz.cuni.mff.d3s.events.MessageEvent;
  *
  */
 @DEECoEnsemble
-//@DEECoPeriodicScheduling(5000)
+@DEECoPeriodicScheduling(5000)
 public class AlertEnsemble extends Ensemble {
 
 	/**

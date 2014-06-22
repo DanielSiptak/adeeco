@@ -1,43 +1,30 @@
 package cz.cuni.mff.ms.siptak.adeeco;
 
-import java.io.Serializable;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import cz.cuni.mff.d3s.deeco.demo.cloud.AlertEnsemble;
 import cz.cuni.mff.d3s.deeco.demo.cloud.MigrationEnsemble;
 import cz.cuni.mff.d3s.deeco.demo.cloud.NodeA;
 import cz.cuni.mff.d3s.deeco.demo.cloud.NodeB;
-import cz.cuni.mff.d3s.deeco.demo.convoy.ConvoyEnsemble;
-import cz.cuni.mff.d3s.deeco.demo.convoy.RobotFollowerComponent;
-import cz.cuni.mff.d3s.deeco.demo.convoy.RobotLeaderComponent;
+import cz.cuni.mff.d3s.events.BundleEvent;
 import cz.cuni.mff.d3s.events.ChangedKnowledgeEvent;
+import cz.cuni.mff.d3s.events.ServiceEvent;
 import cz.cuni.mff.ms.siptak.adeeco.service.AdeecoService;
-import cz.cuni.mff.ms.siptak.adeeco.service.AppMessenger;
 import cz.cuni.mff.ms.siptak.adeeco.service.RuntimeBundle;
-import cz.cuni.mff.ms.siptak.adeeco.service.AppMessenger.ACTIVITY;
-import cz.cuni.mff.ms.siptak.adeeco.service.AppMessenger.AppLogger;
 import cz.cuni.mff.ms.siptak.adeecolib.R;
 import de.greenrobot.event.EventBus;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.MulticastLock;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -50,39 +37,14 @@ public class AdeecoActivity extends Activity {
 	 * Multicast lock for enabling multicast for this application
 	 */
 	MulticastLock lock;
-	
-	/** Messenger for communicating with service. */
-	Messenger mService = null;
 
-	/**
-	 * Target we publish for clients to send messages to IncomingHandler.
-	 */
-	final Messenger mMessenger = new Messenger(new IncomingHandler());
-	
 	/**
 	 * Reference to logView created in this activity
 	 */
 	LogView logView;
 	
+	private boolean serviceRunning = false;
 	
-	/**
-	 * Event code used for setting OnEventListener which is receiving all events send to activity.
-	 */
-	final static int ALL_TAG = Integer.MAX_VALUE;
-	
-	AppMessenger appMessenger = AppMessenger.getInstance();
-	
-	/**
-	 * Handler of incoming messages from service.
-	 */
-	@SuppressLint("HandlerLeak")
-	class IncomingHandler extends Handler {
-		@Override
-		public void handleMessage(Message msg) {
-			super.handleMessage(msg);
-		}
-	}
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -93,7 +55,6 @@ public class AdeecoActivity extends Activity {
 		if (prefs.getBoolean("service_autostart", true)) {
 			setServiceStatus(true);
 		}
-		
 		if (savedInstanceState!=null) {
 			onRestoreInstanceState(savedInstanceState);
 		}
@@ -104,10 +65,6 @@ public class AdeecoActivity extends Activity {
 		lock = wifi.createMulticastLock("adeeco");
 		lock.setReferenceCounted(true);
 		lock.acquire();
-	}
-	
-	public void onEventMainThread(ChangedKnowledgeEvent event){
-		System.err.println("Event received "+event.getKey()+" : "+event.getValue());
 	}
 	
 	@Override
@@ -147,7 +104,7 @@ public class AdeecoActivity extends Activity {
 			// This is called when the connection with the service has been
 			// established, giving us the service object we can use to
 			// interact with the service.
-			mService = new Messenger(service);
+			//mService = new Messenger(service);
 		}
 
 		public void onServiceDisconnected(ComponentName className) {
@@ -155,7 +112,7 @@ public class AdeecoActivity extends Activity {
 			// unexpectedly disconnected -- that is, its process crashed.
 			Intent intent = new Intent(AdeecoActivity.this, AdeecoService.class);
 			stopService(intent);
-			mService = null;
+			//mService = null;
 		}
 	};
 
@@ -166,10 +123,32 @@ public class AdeecoActivity extends Activity {
 		}
 		super.onDestroy();
 	}
-
+	
+	private void postEvent(Object event) {
+		EventBus.getDefault().post(event);
+	}
+	
+	public void onEvent(ServiceEvent event){
+		System.out.println("ServiceEvent received by activity "+event.getType().toString());
+		switch (event.getType()){
+			case SERVICE_STARTED:
+				serviceRunning = true;
+				break;
+			case SERVICE_STOPPED:
+				serviceRunning = false;
+				break;
+			default:
+				break;
+		}
+	}
+	
+	public void onEventMainThread(ChangedKnowledgeEvent event){
+	//	System.err.println("Event received "+event.getKey()+" : "+event.getValue());
+	}
+	
 	/** SERVICE HANDLING **/
 	private boolean isServiceRunning() {
-		return mService != null && mService.getBinder().isBinderAlive();
+		return serviceRunning;//mService != null && mService.getBinder().isBinderAlive();
 	}
 
 	private void setServiceStatus(boolean shouldRun) {
@@ -177,18 +156,19 @@ public class AdeecoActivity extends Activity {
 			// we want service running but it is not -> starting
 			
 			Toast.makeText(this, "Starting service", Toast.LENGTH_SHORT).show();
-			System.out.println("make text");
 			final Activity act = this;
-			Thread t = new Thread(){
-				public void run(){
+			Runnable t = new Runnable() {
+				
+				@Override
+				public void run() {
 					Intent intent = new Intent(act, AdeecoService.class);
-					intent.putExtra(AdeecoService.MESSENGER, mMessenger);
 					startService(intent);
 					bindService(new Intent(act, AdeecoService.class), mConnection,
 							Context.BIND_AUTO_CREATE);	
+					
 				}
-				};
-			t.start();
+			};
+			new Thread(t).start();
 		} else if (!shouldRun && isServiceRunning()) {
 			// we want service stopped but it is not -> stopping
 			unbindService(mConnection); // we need to unbind so service will not
@@ -196,7 +176,7 @@ public class AdeecoActivity extends Activity {
 			// automatically started.
 			Intent intent = new Intent(this, AdeecoService.class);
 			stopService(intent);
-			mService = null;
+			//mService = null;
 		}
 	}
 
@@ -210,8 +190,7 @@ public class AdeecoActivity extends Activity {
 				break;
 			case R.id.service_status_change:
 				// changing current service status
-				boolean newStatus = !isServiceRunning();
-				setServiceStatus(newStatus);
+				setServiceStatus(!isServiceRunning());
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
@@ -223,6 +202,7 @@ public class AdeecoActivity extends Activity {
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		CharSequence service_item;
+		Log.i("Activity","creating menu "+isServiceRunning());
 		if (isServiceRunning()) {
 			service_item = getText(R.string.service_status_stop);
 		} else {
@@ -233,7 +213,8 @@ public class AdeecoActivity extends Activity {
 	}
 	
 	public void startRuntime(View view) {
-		sendMessageToService(AppMessenger.SERVICE.RUNTIME_START, null);
+		//sendMessageToService(AppMessenger.SERVICE.RUNTIME_START, null);
+		postEvent(new ServiceEvent(ServiceEvent.TYPE.RUNTIME_START));
 		Button button = (Button) view;
 		button.setText(R.string.pause_runtime);
 		button.setOnClickListener(new OnClickListener() {
@@ -243,9 +224,11 @@ public class AdeecoActivity extends Activity {
 			}
 		});
 	}
-
+	
 	public void pauseRuntime(View view) {
-		sendMessageToService(AppMessenger.SERVICE.RUNTIME_PAUSE, null);
+		//EventBus.getDefault().post(new ServiceEvent(ServiceEvent.TYPE.START));
+		//sendMessageToService(AppMessenger.SERVICE.RUNTIME_PAUSE, null);
+		postEvent(new ServiceEvent(ServiceEvent.TYPE.RUNTIME_PAUSE));
 		Button button = (Button) view;
 		button.setText(R.string.start_runtime);
 		button.setOnClickListener(new OnClickListener() {
@@ -255,7 +238,7 @@ public class AdeecoActivity extends Activity {
 			}
 		});
 	}
-
+/*
 	private void sendMessageToService(AppMessenger.SERVICE what, Serializable obj) {
 		if (isServiceRunning()) {
 			Bundle bundle = new Bundle();
@@ -266,28 +249,24 @@ public class AdeecoActivity extends Activity {
 					.show();
 		}
 	}
-
+*/
 	public void startBundle(View view) {
 		RuntimeBundle bundle = null;
-		System.out.println("start button presed "+view.getId()+" "+R.id.start_nodea+" "+AppMessenger.SERVICE.BUNDLE_ADD.ordinal());
 		switch (view.getId()) {
 		case R.id.start_nodea:
 			bundle = new RuntimeBundle("nodea", 
 					Arrays.asList(new Class<?>[] {NodeA.class}),
 					Arrays.asList(new Class<?>[] {}));
-			sendMessageToService(AppMessenger.SERVICE.BUNDLE_ADD, bundle);
 			break;
 		case R.id.start_nodeb:
 			bundle = new RuntimeBundle("nodeb", 
 					Arrays.asList(new Class<?>[] {NodeB.class }),
 					Arrays.asList(new Class<?>[] {}));
-			sendMessageToService(AppMessenger.SERVICE.BUNDLE_ADD, bundle);
 			break;
 		case R.id.start_migration:
 			bundle = new RuntimeBundle("migration", 
 					Arrays.asList(new Class<?>[] {}),
 					Arrays.asList(new Class<?>[] {MigrationEnsemble.class}));
-			sendMessageToService(AppMessenger.SERVICE.BUNDLE_ADD, bundle);
 			break;			
 		case R.id.start_alert:
 			/*
@@ -299,18 +278,21 @@ public class AdeecoActivity extends Activity {
 			bundle = new RuntimeBundle("alert", 
 					Arrays.asList(new Class<?>[] {}),
 					Arrays.asList(new Class<?>[] {AlertEnsemble.class }));
-			sendMessageToService(AppMessenger.SERVICE.BUNDLE_ADD, bundle);
 			break;
 		}
+		if (bundle != null)
+			postEvent(new BundleEvent(BundleEvent.TYPE.ADD,bundle));
 	}
 
 	public void stopBundle(View view) {
 		switch (view.getId()) {
 		case R.id.start_migration:
-			sendMessageToService(AppMessenger.SERVICE.BUNDLE_REMOVE, "cloud");
+			//sendMessageToService(AppMessenger.SERVICE.BUNDLE_REMOVE, "cloud");
+			postEvent(new BundleEvent(BundleEvent.TYPE.REMOVE,"cloud"));
 			break;
 		case R.id.start_alert:
-			sendMessageToService(AppMessenger.SERVICE.BUNDLE_REMOVE, "convoy");
+			//sendMessageToService(AppMessenger.SERVICE.BUNDLE_REMOVE, "convoy");
+			postEvent(new BundleEvent(BundleEvent.TYPE.REMOVE,"convoy"));
 			break;
 		}
 	}
