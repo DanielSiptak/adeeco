@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Adeeco cloud</string>
+    <string name="title_component_detail">Component Detail</string>
+    <string name="preference_activity_title">Settings</string>
+    <string name="action_settings">Settings</string>
+    <string name="service_status_start">Start service</string>
+    <string name="service_status_stop">Stop service</string>
+    <string name="service_notification">Adeeco service</string>
+    <string name="service_notification_label">Adeeco cloud demo service</string>
+    <string name="title_activity_message">Messages</string>
+
+</resources>

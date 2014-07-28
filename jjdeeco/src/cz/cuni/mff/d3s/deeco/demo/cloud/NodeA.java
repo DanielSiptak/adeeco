@@ -35,6 +35,8 @@ public class NodeA extends ComponentKnowledge {
 	public Integer networkId;
 	public String targetNode;
 	
+	public String id;
+	
 	@DEECoInitialize
 	public static ComponentKnowledge getInitialKnowledge() {
 		NodeA k = new NodeA();

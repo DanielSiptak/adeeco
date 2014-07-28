@@ -1,0 +1,9 @@
+<resources>
+    
+    <string name="service_autostart_title">Start service automatically</string>
+    <string name="service_autostart_summary">Do you want to start service right after application start</string>
+    
+    <string name="deeco_preferences_title">Running deeco parts</string>
+    <string name="deeco_preferences_summary">Select which parts will be running on DEECO</string>
+    
+</resources>

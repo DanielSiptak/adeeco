@@ -39,6 +39,11 @@ import cz.cuni.mff.d3s.deeco.knowledge.Knowledge;
 @DEECoPeriodicScheduling(1000)
 public class ConvoyEnsemble extends Ensemble {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	// must be public, static and extend Knowledge
 	public static class ConvoyOutInterface extends Knowledge {
 		public String convoyRobot;

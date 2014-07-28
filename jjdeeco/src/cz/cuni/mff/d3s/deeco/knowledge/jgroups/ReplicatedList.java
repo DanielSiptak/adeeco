@@ -32,6 +32,10 @@ public class ReplicatedList<T> extends LinkedList<T> implements IMerging {
 		return super.toString()+" ["+this.version+"]";
 	}
 	
+	public int getVersion(){
+		return version;
+	}
+	
 	@Override
 	public void mergeWith(Serializable key, IMerging stored) {
 		if (stored instanceof ReplicatedList<?>){

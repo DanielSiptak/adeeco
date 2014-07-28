@@ -16,4 +16,20 @@ public class MessageEvent {
 	public String getValue(){
 		return this.value;
 	}
+
+	public class EnsembleMessage extends MessageEvent {
+
+		public EnsembleMessage(String key, String value) {
+			super(key, value);
+		}
+	}
+
+	public class ComponentMessage extends MessageEvent {
+
+		public ComponentMessage(String key, String value) {
+			super(key, value);
+		}
+	}
 }
+
+

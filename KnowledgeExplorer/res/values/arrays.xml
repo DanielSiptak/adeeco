@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="apps_names" >
+        <item>Cloud component</item>
+        <item>Alert ensemble</item>
+        <item>Migration ensemble</item>
+    </string-array>
+    <string-array name="apps_values" >
+        <item>cz.cuni.mff.siptak.demo.NodeInfo</item>
+        <item>cz.cuni.mff.siptak.demo.AlertEnsemble</item>
+        <item>cz.cuni.mff.siptak.demo.MigrationEnsemble</item>
+    </string-array>
+</resources>
