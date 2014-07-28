@@ -15,37 +15,37 @@ import android.widget.BaseAdapter;
  * Helper class for providing Knowledge content for user interfaces
  * <p>
  */
-public class DeecoContent {
+public class ComponentContent {
 	
-	private static final DeecoContent INSTANCE = new DeecoContent();
+	private static final ComponentContent INSTANCE = new ComponentContent();
 
 	@SuppressWarnings("unused")
-	private String TAG = "KnowledgeContent"; 
+	private String TAG = "ComponentContent"; 
 	
 	/**
 	 * A list of Knowledge items
 	 */
-	private List<DeecoItem> item_list = new ArrayList<DeecoItem>();
+	private List<ComponentItem> item_list = new ArrayList<ComponentItem>();
 
 	/**
 	 * A map of Knowledge items, by ID.
 	 */
-	private Map<String, DeecoItem> knowledge_items = new HashMap<String, DeecoItem>();
+	private Map<String, ComponentItem> knowledge_items = new HashMap<String, ComponentItem>();
 
 	
-	public static DeecoContent getInstance() {
+	public static ComponentContent getInstance() {
 		return INSTANCE;
 	}
 
-	private DeecoContent() {
+	private ComponentContent() {
 		EventBus.getDefault().register(this);
 	}
 	
-	public List<DeecoItem> getItemList() {
+	public List<ComponentItem> getItemList() {
 		return item_list;
 	}
 	
-	public Map<String, DeecoItem> getItemMap() {
+	public Map<String, ComponentItem> getItemMap() {
 		return knowledge_items;
 	}
 	
@@ -57,9 +57,9 @@ public class DeecoContent {
 	
 	public void onEventMainThread(ChangedKnowledgeEvent event){
 		if (!event.getNameSpace().equals("")){
-			DeecoItem item = knowledge_items.get(event.getNameSpace());
+			ComponentItem item = knowledge_items.get(event.getNameSpace());
 			if (item == null ) {
-				item = new DeecoItem(event.getNameSpace());
+				item = new ComponentItem(event.getNameSpace());
 				item_list.add(item);
 			}
 			item.aceeptEvent(event);
@@ -92,12 +92,12 @@ public class DeecoContent {
 	/**
 	 * A knowledge item representing a piece of content.
 	 */
-	public static class DeecoItem {
+	public static class ComponentItem {
 		private String namespace;
 		private String name = null; // this value is taken from ID part of the knowledge 
 		private Calendar timestamp = Calendar.getInstance();
 		
-		class KnowledgeHolder{
+		class ComponentHolder{
 			String id;
 			String namespace;
 			List<Object> value;
@@ -105,12 +105,12 @@ public class DeecoContent {
 			Calendar timestamp;
 		}
 		
-		private List<KnowledgeHolder> knowledge_list = new ArrayList<KnowledgeHolder>();
+		private List<ComponentHolder> knowledge_list = new ArrayList<ComponentHolder>();
 
 		
-		private Map<String,KnowledgeHolder> knowledge = new HashMap<String,KnowledgeHolder>();
+		private Map<String,ComponentHolder> knowledge = new HashMap<String,ComponentHolder>();
 		
-		public DeecoItem(String namespace) {
+		public ComponentItem(String namespace) {
 			this.namespace = namespace;
 		}
 
@@ -131,7 +131,7 @@ public class DeecoContent {
 			return timestamp;
 		}
 		
-		public List<KnowledgeHolder> getKnowledgeList(){
+		public List<ComponentHolder> getKnowledgeList(){
 			return knowledge_list;
 		}
 		
@@ -143,9 +143,9 @@ public class DeecoContent {
 						name=obj.toString();
 					}
 				}
-				KnowledgeHolder holder=knowledge.get(event.getId());
+				ComponentHolder holder=knowledge.get(event.getId());
 				if (holder==null){
-					holder= new KnowledgeHolder();
+					holder= new ComponentHolder();
 					knowledge_list.add(holder);
 				}
 				holder.id=event.getId();

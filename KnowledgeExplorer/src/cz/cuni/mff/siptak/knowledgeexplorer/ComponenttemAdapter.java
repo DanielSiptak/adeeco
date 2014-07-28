@@ -3,7 +3,7 @@ package cz.cuni.mff.siptak.knowledgeexplorer;
 import java.util.Calendar;
 import java.util.List;
 
-import cz.cuni.mff.siptak.knowledgeexplorer.DeecoContent.DeecoItem;
+import cz.cuni.mff.siptak.knowledgeexplorer.ComponentContent.ComponentItem;
 
 import android.content.Context;
 import android.view.View;
@@ -11,11 +11,11 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-public class DeecoItemAdapter extends ArrayAdapter<DeecoItem> {
-	private List<DeecoItem> objects;
+public class ComponenttemAdapter extends ArrayAdapter<ComponentItem> {
+	private List<ComponentItem> objects;
 	
-	public DeecoItemAdapter(Context context, int resource,
-			int textViewResourceId, List<DeecoItem> objects) {
+	public ComponenttemAdapter(Context context, int resource,
+			int textViewResourceId, List<ComponentItem> objects) {
 		super(context, resource, textViewResourceId, objects);
 		this.objects = objects;
 	}
@@ -25,7 +25,7 @@ public class DeecoItemAdapter extends ArrayAdapter<DeecoItem> {
 		View view = super.getView(position, convertView, parent);
 		
 		TextView text2 = (TextView)view.findViewById(android.R.id.text2);
-		DeecoItem item = objects.get(position);
+		ComponentItem item = objects.get(position);
 		if (item != null) {
 			text2.setText(item.getTimestamp().get(Calendar.HOUR)+":"+item.getTimestamp().get(Calendar.MINUTE));
 		}

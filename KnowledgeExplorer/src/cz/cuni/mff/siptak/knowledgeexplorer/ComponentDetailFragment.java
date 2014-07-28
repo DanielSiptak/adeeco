@@ -3,8 +3,8 @@ package cz.cuni.mff.siptak.knowledgeexplorer;
 import java.util.List;
 
 import cz.cuni.mff.ms.dsiptak.knowledgeexplorer.R;
-import cz.cuni.mff.siptak.knowledgeexplorer.DeecoContent.DeecoItem;
-import cz.cuni.mff.siptak.knowledgeexplorer.DeecoContent.DeecoItem.KnowledgeHolder;
+import cz.cuni.mff.siptak.knowledgeexplorer.ComponentContent.ComponentItem;
+import cz.cuni.mff.siptak.knowledgeexplorer.ComponentContent.ComponentItem.ComponentHolder;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
@@ -31,9 +31,9 @@ public class ComponentDetailFragment extends ListFragment {
 	public ComponentDetailFragment() {
 	}
 
-	private DeecoContent content = DeecoContent.getInstance();
-	private DeecoItem item = null;
-	private DeecoDetailAdapter adapter;
+	private ComponentContent content = ComponentContent.getInstance();
+	private ComponentItem item = null;
+	private ComponentDetailAdapter adapter;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -41,14 +41,14 @@ public class ComponentDetailFragment extends ListFragment {
 		
 		
 		//content.getItemMap().get();
-		List<KnowledgeHolder> list = null;
+		List<ComponentHolder> list = null;
 		if (getArguments().containsKey(ARG_ITEM_ID))
 		{
 			item = content.getItemMap().get(getArguments().get(ARG_ITEM_ID));
 			list = item.getKnowledgeList();
 		}
 		
-		adapter = new DeecoDetailAdapter(getActivity(),
+		adapter = new ComponentDetailAdapter(getActivity(),
 				R.layout.list_detail,
 				android.R.id.text1, list);
 		

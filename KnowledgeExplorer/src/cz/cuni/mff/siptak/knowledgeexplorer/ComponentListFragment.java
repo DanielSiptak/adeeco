@@ -37,7 +37,7 @@ public class ComponentListFragment extends ListFragment {
 	 */
 	private int mActivatedPosition = ListView.INVALID_POSITION;
 
-	private ArrayAdapter<DeecoContent.DeecoItem> adapter = null;
+	private ArrayAdapter<ComponentContent.ComponentItem> adapter = null;
 	
 	/**
 	 * A callback interface that all activities containing this fragment must
@@ -68,12 +68,12 @@ public class ComponentListFragment extends ListFragment {
 	public ComponentListFragment() {
 	}
 
-	private DeecoContent content = DeecoContent.getInstance();
+	private ComponentContent content = ComponentContent.getInstance();
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		adapter = new DeecoItemAdapter(getActivity(),
+		adapter = new ComponenttemAdapter(getActivity(),
 				R.layout.list_item,
 				android.R.id.text1, content.getItemList());
 		content.registerAdapterObserver(adapter);
@@ -120,7 +120,7 @@ public class ComponentListFragment extends ListFragment {
 
 		// Notify the active callbacks interface (the activity, if the
 		// fragment is attached to one) that an item has been selected.
-		mCallbacks.onItemSelected(DeecoContent.getInstance().getItemList().get(position).getNameSpace());
+		mCallbacks.onItemSelected(ComponentContent.getInstance().getItemList().get(position).getNameSpace());
 	}
 
 	@Override

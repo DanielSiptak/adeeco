@@ -12,7 +12,6 @@ import de.greenrobot.event.EventBus;
 
 public class MessageContent {
 
-	
 	private static final MessageContent INSTANCE = new MessageContent();
 
 	@SuppressWarnings("unused")

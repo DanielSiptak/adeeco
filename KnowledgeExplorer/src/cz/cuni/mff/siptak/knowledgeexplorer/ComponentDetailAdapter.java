@@ -4,7 +4,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import cz.cuni.mff.ms.dsiptak.knowledgeexplorer.R;
-import cz.cuni.mff.siptak.knowledgeexplorer.DeecoContent.DeecoItem.KnowledgeHolder;
+import cz.cuni.mff.siptak.knowledgeexplorer.ComponentContent.ComponentItem.ComponentHolder;
 
 import android.content.Context;
 import android.view.View;
@@ -12,11 +12,11 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-public class DeecoDetailAdapter extends ArrayAdapter<KnowledgeHolder> {
-	private List<KnowledgeHolder> objects;
+public class ComponentDetailAdapter extends ArrayAdapter<ComponentHolder> {
+	private List<ComponentHolder> objects;
 	
-	public DeecoDetailAdapter(Context context, int resource,
-			int textViewResourceId, List<KnowledgeHolder> objects) {
+	public ComponentDetailAdapter(Context context, int resource,
+			int textViewResourceId, List<ComponentHolder> objects) {
 		super(context, resource, textViewResourceId, objects);
 		this.objects = objects;
 	}
@@ -30,7 +30,7 @@ public class DeecoDetailAdapter extends ArrayAdapter<KnowledgeHolder> {
 		TextView sub_text1 = (TextView)view.findViewById(R.id.sub_text1);
 		TextView sub_text2 = (TextView)view.findViewById(R.id.sub_text2);
 		
-		KnowledgeHolder item = objects.get(position);
+		ComponentHolder item = objects.get(position);
 		if (item != null) {
 			text1.setText(item.id);
 			if (item.value.size() > 0 && !item.id.startsWith("#")) {

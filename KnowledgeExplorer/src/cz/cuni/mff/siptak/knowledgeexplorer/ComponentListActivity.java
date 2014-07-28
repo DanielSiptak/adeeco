@@ -79,6 +79,9 @@ public class ComponentListActivity extends FragmentActivity implements
 		if (savedInstanceState!=null) {
 			onRestoreInstanceState(savedInstanceState);
 		}
+		/* init content classes so the y register for event handling*/
+		ComponentContent.getInstance();
+		MessageContent.getInstance();
 		
 	}
 
@@ -226,7 +229,7 @@ public class ComponentListActivity extends FragmentActivity implements
 			// we want service stopped but it is not -> stopping
 			Intent intent = new Intent(this, AdeecoService.class);
 			stopService(intent);
-			DeecoContent.getInstance().clear();
+			ComponentContent.getInstance().clear();
 		}
 	}
 
