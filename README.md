@@ -23,7 +23,7 @@ To build the project these steps are needed
 - Download and install current version of Android SDK
 - Checkout source code from [https://github.com/DanielSiptak/adeeco.git] 
 - Import projects to eclipse with Android SDK and ADT support
-- Android activity to run `AdeecoActivity.java` in `cz.cuni.mff.ms.dsiptak.adeeco` package
+- Build and run either adeeco project of knowledgeExplorer project
 - Create new `Android Virtual Device` with Android version higher than HoneyComb (Android 3.0)
 
 ## Project structure
@@ -31,16 +31,16 @@ There are several eclipse projects currently available.
 - `Adeeco` Main project combining jjdeeco project with android application code.
 - `android-support-v7-appcompat` Support project to enable compatibility for versions below 3.0 (Currently disabled)
 - `jjdeeco` Support project for developing jGroups based knowledge repository for JDEECo and servers as source for Adeeco project.
+-  KnowledgeExplorer - This is an example application showing DEECo Could demo in GUI envrimonet. It is a more advance example that Adeeco project
 
 ##Demo application
 Current `Adeeco` application is serving as demo for starting cloud demo from JDEECo.
 It is starting components and ensembles independently of each other.
 
 ##Development status
-Currently Replication and Merging of multiple deveice is working.
-Creation of eventbus enviroment and locking is to be done.
+All necessary parts are done.
 
- 
+
 ##References
 
 * https://github.com/d3scomp/JDEECo
