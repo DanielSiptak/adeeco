@@ -31,7 +31,7 @@ There are several eclipse projects currently available.
 - `Adeeco` Main project combining jjdeeco project with android application code.
 - `android-support-v7-appcompat` Support project to enable compatibility for versions below 3.0 (Currently disabled)
 - `jjdeeco` Support project for developing jGroups based knowledge repository for JDEECo and servers as source for Adeeco project.
--  KnowledgeExplorer - This is an example application showing DEECo Could demo in GUI envrimonet. It is a more advance example that Adeeco project
+-  KnowledgeExplorer This is an example application showing DEECo Could demo in GUI envrimonet. It is a more advance example that Adeeco project
 
 ##Demo application
 Current `Adeeco` application is serving as demo for starting cloud demo from JDEECo.
