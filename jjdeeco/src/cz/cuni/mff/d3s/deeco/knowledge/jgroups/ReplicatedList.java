@@ -19,14 +19,6 @@ public class ReplicatedList<T> extends LinkedList<T> implements IMerging {
 	
 	protected int version = 0;
 	
-	
-	/*
-	private MergingFunctor<T> merger;
-	public abstract class MergingFunctor<F>{
-		public abstract void mergeWith(Serializable key, ReplicatedList<F> stored);
-	}
-	*/
-	
 	@Override
 	public String toString() {
 		return super.toString()+" ["+this.version+"]";

@@ -15,7 +15,6 @@
  ******************************************************************************/
 package cz.cuni.mff.d3s.deeco.knowledge.jgroups;
 
-import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -111,15 +110,6 @@ public class ReplicatedKnowledgeRepository extends KnowledgeRepository {
 	@Override
 	public Object[] get(String entryKey, ISession session)
 			throws KRExceptionUnavailableEntry, KRExceptionAccessError {
-		/*
-		MergingValueHolder<LinkedList<Object>> holder = map.get(entryKey);
-		if (holder == null) {
-			throw new KRExceptionUnavailableEntry("Key " + entryKey
-					+ " is not in the knowledge repository.");
-		}
-		List<Object> vals = holder.get();
-		*/
-		//List<Object> vals = map.get(entryKey);
 		List<Object> vals = getSession(session).get(entryKey);
 		if (vals == null) {
 			throw new KRExceptionUnavailableEntry("Key " + entryKey
@@ -144,7 +134,6 @@ public class ReplicatedKnowledgeRepository extends KnowledgeRepository {
 		vals = (ReplicatedList<Object>) DeepCopy.copy(vals);
 		vals.add(value);
 		getSession(session).put(entryKey, vals);
-		//map.put(entryKey, vals);
 	}
 
 	@Override
@@ -160,7 +149,6 @@ public class ReplicatedKnowledgeRepository extends KnowledgeRepository {
 		if (vals.size() <= 1) {
 			vals.clear();
 			getSession(session).take(entryKey);
-			//map.replace(entryKey,vals);
 		}
 		return vals.toArray();
 	}
